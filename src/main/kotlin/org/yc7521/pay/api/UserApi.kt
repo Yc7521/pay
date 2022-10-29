@@ -4,10 +4,11 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.yc7521.pay.api.base.BaseApi
-import org.yc7521.pay.model.genTradingCode
+import org.yc7521.pay.model.genPaymentCode
+import org.yc7521.pay.model.genReceiptCode
 import org.yc7521.pay.repository.PayInfoRepository
 import org.yc7521.pay.repository.UserInfoRepository
-import org.yc7521.pay.repository.UserRepository
+import org.yc7521.pay.service.UserAccountService
 import org.yc7521.pay.service.impl.PaymentServiceImpl
 import java.math.BigDecimal
 
@@ -18,21 +19,32 @@ class UserApi(
   private val userInfoRepository: UserInfoRepository,
   private val payInfoRepository: PayInfoRepository,
   private val paymentService: PaymentServiceImpl,
-  private val userRepository: UserRepository,
-) : BaseApi(userRepository) {
+  private val userAccountService: UserAccountService,
+) : BaseApi() {
 
   /**
    * GET: get current user
    */
   @GetMapping("/me")
-  fun me() = ResponseEntity.ok(currentUserInfo!!)
+  fun me() = ResponseEntity.ok(currentUserInfo)
 
 
   /**
    * DELETE: delete current user
    */
   @DeleteMapping("/me")
-  fun deleteMe() = userRepository.delete(currentUser!!)
+  fun deleteMe() = userAccountService.delete(currentUser)
+
+  /**
+   * PUT: change password
+   */
+  @PutMapping("/me/password")
+  fun changePassword(
+    @RequestParam
+    oldPassword: String,
+    @RequestParam
+    newPassword: String,
+  ) = userAccountService.changePassword(currentUser, oldPassword, newPassword)
 
   /**
    * GET: get user by id
@@ -42,9 +54,7 @@ class UserApi(
     @PathVariable
     id: Long,
   ) = ResponseEntity.ok(
-    userRepository.findById(id).orElseThrow {
-      RuntimeException("User not found")
-    }.userInfo!!
+    userAccountService.findById(id).userInfo!!
   )
 
   /**
@@ -52,19 +62,15 @@ class UserApi(
    */
   @GetMapping("/me/payment-code")
   fun genPaymentCode() = ResponseEntity.ok(
-    currentUserInfo!!.genTradingCode(
-      tradingState = org.yc7521.pay.model.enums.TradingState.Payment
-    ).toVM()
+    currentUserInfo.genPaymentCode().toVM()
   )
 
   /**
    * GET: gen receipt code
    */
   @GetMapping("/me/receipt-code")
-  fun genReceiptCode(money: BigDecimal?) = ResponseEntity.ok(
-    currentUserInfo!!.genTradingCode(
-      tradingState = org.yc7521.pay.model.enums.TradingState.Receipt, money = money
-    ).toVM()
+  fun genReceiptCode(money: BigDecimal) = ResponseEntity.ok(
+    currentUserInfo.genReceiptCode(money = money).toVM()
   )
 
 }

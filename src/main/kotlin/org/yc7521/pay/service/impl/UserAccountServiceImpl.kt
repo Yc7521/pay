@@ -11,8 +11,16 @@ import org.yc7521.pay.service.UserAccountService
 
 @Service
 class UserAccountServiceImpl(
-  private val userRepository: UserRepository, private val passwordEncoder: PasswordEncoder
+  private val userRepository: UserRepository,
+  private val passwordEncoder: PasswordEncoder,
 ) : UserAccountService {
+  /**
+   * find by id
+   */
+  override fun findById(id: Long): UserAccount {
+    return userRepository.findById(id).orElseThrow { RuntimeException("User not found") }
+  }
+
   /**
    * login
    */
@@ -61,5 +69,14 @@ class UserAccountServiceImpl(
    */
   override fun deleteById(id: Long) {
     userRepository.deleteById(id)
+  }
+
+  override fun changePassword(it: UserAccount, oldPassword: String, newPassword: String) {
+    if (passwordEncoder.matches(oldPassword, it.password)) {
+      it.password = passwordEncoder.encode(newPassword)
+      userRepository.save(it)
+    } else {
+      throw Exception("旧密码错误")
+    }
   }
 }

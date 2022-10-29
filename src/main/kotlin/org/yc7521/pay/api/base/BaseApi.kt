@@ -5,14 +5,17 @@ import org.yc7521.pay.model.UserAccount
 import org.yc7521.pay.model.UserInfo
 import org.yc7521.pay.model.UserToken
 import org.yc7521.pay.repository.UserRepository
+import javax.annotation.Resource
 
-open class BaseApi(
-  private val userRepository: UserRepository
-) {
-  val currentUser: UserAccount?
+open class BaseApi {
+  @Resource
+  private lateinit var userRepository: UserRepository
+
+  val currentUser: UserAccount
     get() = userRepository
       .findById((SecurityContextHolder.getContext().authentication.principal as UserToken).id)
-      .orElse(null)
-  val currentUserInfo: UserInfo?
-    get() = currentUser?.userInfo
+      .orElseThrow { NoSuchElementException("Current user not found") }
+  val currentUserInfo: UserInfo
+    get() = currentUser.userInfo
+      ?: throw NoSuchElementException("Current user info not found")
 }

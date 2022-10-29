@@ -11,7 +11,7 @@ open class PayVM(
   open var userId: Long? = null,
   open var money: BigDecimal? = null,
   @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-  open var create: LocalDateTime? = null,
+  open var create: LocalDateTime? = LocalDateTime.now(),
 ) {
   fun toPayInfo(
     from: UserInfo, to: UserInfo, goodsInfo: String? = null,

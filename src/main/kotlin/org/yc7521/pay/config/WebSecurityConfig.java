@@ -17,6 +17,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.yc7521.pay.filter.JwtAuthenticationFilter;
@@ -41,14 +42,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   @Resource
   private UserDetailsService userDetailsService;
   @Resource
-  private PasswordEncoder    passwordEncoder;
-  @Resource
   private TokenService       tokenService;
+
+  // 配置密码加密器
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 
   // 配置认证管理器
   @Override
   protected void configure(AuthenticationManagerBuilder auth) {
-    auth.authenticationProvider(authenticationProvider());
+    auth.authenticationProvider(authenticationProvider(passwordEncoder()));
   }
 
   @Bean
@@ -107,7 +112,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
    * @return 认证提供者
    */
   @Bean
-  public DaoAuthenticationProvider authenticationProvider() {
+  public DaoAuthenticationProvider authenticationProvider(PasswordEncoder passwordEncoder) {
     // 创建DaoAuthenticationProvider实例
     DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider() {
       @Override
