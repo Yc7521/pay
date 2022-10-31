@@ -16,11 +16,11 @@ import java.util.logging.Logger
 import javax.annotation.Resource
 
 @SpringBootTest
-class TokenCacheTest {
+class TradingCodeCacheTest {
   private val logger = Logger.getLogger(this.javaClass.name)
 
   @Resource
-  private lateinit var cache: TokenCache
+  private lateinit var cache: TradingCodeCache
 
   @Resource
   private lateinit var executor: ScheduledExecutorService
@@ -39,9 +39,8 @@ class TokenCacheTest {
   @Test
   fun expireTest() {
     val userInfo = userAccountService.findById(2).userInfo!!
-    val id = cache.getId()
-    val code = userInfo.genPaymentCode()
-    cache[id] = code
+    val code = cache.put(userInfo.genPaymentCode())
+    val id = code.id!!
     assertTrue(cache.has(id))
     assertTrue(cache[id] == code)
     val tasks = listOf(

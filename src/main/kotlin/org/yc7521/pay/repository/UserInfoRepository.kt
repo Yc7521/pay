@@ -1,4 +1,4 @@
-package org.yc7521.pay.repository;
+package org.yc7521.pay.repository
 
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
@@ -12,7 +12,7 @@ interface UserInfoRepository : JpaRepository<UserInfo, Long> {
   @Modifying
   @Query("update UserInfo u set u.money = ?2 where u.id = ?1")
   fun saveMoney(
-    id: Long, money: BigDecimal?
+    id: Long, money: BigDecimal?,
   ): Int
 
 }

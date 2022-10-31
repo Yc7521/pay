@@ -9,6 +9,7 @@ import org.yc7521.pay.model.genReceiptCode
 import org.yc7521.pay.repository.PayInfoRepository
 import org.yc7521.pay.repository.UserInfoRepository
 import org.yc7521.pay.service.UserAccountService
+import org.yc7521.pay.service.data.TradingCodeCache
 import org.yc7521.pay.service.impl.PaymentServiceImpl
 import java.math.BigDecimal
 
@@ -20,6 +21,7 @@ class UserApi(
   private val payInfoRepository: PayInfoRepository,
   private val paymentService: PaymentServiceImpl,
   private val userAccountService: UserAccountService,
+  private val tradingCodeCache: TradingCodeCache,
 ) : BaseApi() {
 
   /**
@@ -62,15 +64,15 @@ class UserApi(
    */
   @GetMapping("/me/payment-code")
   fun genPaymentCode() = ResponseEntity.ok(
-    currentUserInfo.genPaymentCode().toVM()
+    tradingCodeCache.put(currentUserInfo.genPaymentCode()).toVM()
   )
 
   /**
    * GET: gen receipt code
    */
   @GetMapping("/me/receipt-code")
-  fun genReceiptCode(money: BigDecimal) = ResponseEntity.ok(
-    currentUserInfo.genReceiptCode(money = money).toVM()
+  fun genReceiptCode(money: BigDecimal? = null) = ResponseEntity.ok(
+    tradingCodeCache.put(currentUserInfo.genReceiptCode(money = money)).toVM()
   )
 
 }

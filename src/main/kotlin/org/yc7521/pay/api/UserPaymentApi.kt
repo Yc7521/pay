@@ -9,15 +9,17 @@ import org.yc7521.pay.api.base.*
 import org.yc7521.pay.model.PayInfo
 import org.yc7521.pay.model.vm.*
 import org.yc7521.pay.repository.*
+import org.yc7521.pay.service.data.TradingCodeCache
 import org.yc7521.pay.service.impl.*
 
 @RestController
 @RequestMapping("/api/user/me/pay")
 @PreAuthorize("isAuthenticated()")
-class PaymentApi(
+class UserPaymentApi(
   private val userInfoRepository: UserInfoRepository,
   private val payInfoRepository: PayInfoRepository,
   private val paymentService: PaymentServiceImpl,
+  private val tradingCodeCache: TradingCodeCache,
 ) : BaseApi() {
 
   /**

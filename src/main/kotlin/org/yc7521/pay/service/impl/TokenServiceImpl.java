@@ -24,11 +24,6 @@ public class TokenServiceImpl implements TokenService {
   }
 
   @Override
-  public String getUsernameFromToken(String token) {
-    return jwtTokenUtil.getUsernameFromToken(token);
-  }
-
-  @Override
   public String getToken(UserAccount account) {
     return getToken(new UserToken(
       account,
@@ -45,5 +40,10 @@ public class TokenServiceImpl implements TokenService {
   @Override
   public String getToken(UserToken user) {
     return jwtTokenUtil.generateToken(user);
+  }
+
+  @Override
+  public String getUsernameFromToken(String token) {
+    return jwtTokenUtil.getUsernameFromToken(token);
   }
 }

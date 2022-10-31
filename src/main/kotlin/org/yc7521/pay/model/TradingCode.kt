@@ -94,7 +94,7 @@ fun UserInfo.genPaymentCode(
  * 收款码
  */
 fun UserInfo.genReceiptCode(
-  money: BigDecimal = 0.toBigDecimal(),
+  money: BigDecimal? = null,
 ) = genTradingCode(
   TradingType.Receipt, money
 )

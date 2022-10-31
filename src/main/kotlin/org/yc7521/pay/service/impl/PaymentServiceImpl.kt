@@ -31,7 +31,8 @@ class PaymentServiceImpl(
       when (tradingCode.tradingType) {
         TradingType.Receipt -> createPayment(
           currUserId, tradingCode.userInfoId!!, PayVM(
-            money = tradingCode.money ?: throw IllegalStateException("money is null")
+            money = tradingCode.money ?: money
+            ?: throw IllegalStateException("money is null")
           )
         )
 

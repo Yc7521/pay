@@ -9,5 +9,5 @@ import java.util.concurrent.ScheduledExecutorService
 class AppConfig {
   // executor
   @Bean
-  fun executor(): ScheduledExecutorService = newScheduledThreadPool(8);
+  fun executor(): ScheduledExecutorService = newScheduledThreadPool(8)
 }

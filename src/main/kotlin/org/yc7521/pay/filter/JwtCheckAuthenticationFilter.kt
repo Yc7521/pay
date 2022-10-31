@@ -19,11 +19,11 @@ import javax.servlet.http.HttpServletResponse
 
 class JwtCheckAuthenticationFilter(
   private val userDetailsService: UserDetailsService,
-  private val tokenService: TokenService
+  private val tokenService: TokenService,
 ) : OncePerRequestFilter() {
   @Throws(IOException::class, ServletException::class)
   override fun doFilterInternal(
-    req: HttpServletRequest, res: HttpServletResponse, chain: FilterChain
+    req: HttpServletRequest, res: HttpServletResponse, chain: FilterChain,
   ) {
     req.getHeader(HEADER_STRING)?.let { header ->
       val authToken: String =

@@ -3,6 +3,7 @@ package org.yc7521.pay.filter
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.http.ResponseEntity.ok
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -26,31 +27,30 @@ class JwtAuthenticationFilter(authenticationManager: AuthenticationManager?) :
     // 设置登录失败处理类
     setAuthenticationFailureHandler { _: HttpServletRequest?, rep: HttpServletResponse, e: AuthenticationException ->
       logger.info("login failed")
-      rep.writer.use {
-        it.write(ObjectMapper().writeValueAsString(mapOf("message" to e.message)))
-      }
+      ResponseUtil.write(ok(mapOf("message" to e.message)), rep)
     }
     // 设置登录成功处理类
     setAuthenticationSuccessHandler { _: HttpServletRequest?, rep: HttpServletResponse, auth: Authentication ->
       logger.info("login success")
       val userToken = auth.principal as UserToken
       logger.info("Authorities: " + auth.authorities)
-      val ok = ResponseEntity.ok(
-        mapOf(
-          "msg" to "${auth.name} 登录成功！", "id_token" to userToken.token
-        )
-      )
       rep.contentType = "application/json;charset=utf-8"
-      ResponseUtil.write(ok, rep)
+      ResponseUtil.write(
+        ok(
+          mapOf(
+            "msg" to "${auth.name} 登录成功！", "id_token" to userToken.token
+          )
+        ), rep
+      )
     }
     setFilterProcessesUrl("/api/login")
   }
 
   @Throws(AuthenticationException::class)
   override fun attemptAuthentication(
-    req: HttpServletRequest, rep: HttpServletResponse
+    req: HttpServletRequest, rep: HttpServletResponse,
   ): Authentication {
-    if (req.contentType.contains(MediaType.APPLICATION_JSON_VALUE)) {
+    if (req.contentType?.contains(MediaType.APPLICATION_JSON_VALUE) == true) {
       val mapper = ObjectMapper()
       try {
         req.inputStream.use { `in` ->

@@ -1,7 +1,6 @@
 package org.yc7521.pay.service
 
 import org.yc7521.pay.model.UserAccount
-import java.util.*
 
 interface UserAccountService {
   /**

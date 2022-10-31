@@ -1,4 +1,4 @@
-package org.yc7521.pay.repository;
+package org.yc7521.pay.repository
 
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable

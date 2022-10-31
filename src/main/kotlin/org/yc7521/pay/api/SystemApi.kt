@@ -8,7 +8,7 @@ import org.yc7521.pay.service.UserAccountService
 @RestController
 @RequestMapping("/api")
 class SystemApi(
-  private val userAccountService: UserAccountService
+  private val userAccountService: UserAccountService,
 ) {
   /**
    * POST: login
@@ -16,7 +16,7 @@ class SystemApi(
   @PostMapping("/login")
   fun login(
     @RequestBody
-    user: LoginVM
+    user: LoginVM,
   ) {
   }
 
@@ -34,7 +34,7 @@ class SystemApi(
   @PostMapping("/register")
   fun register(
     @RequestBody
-    user: LoginVM
+    user: LoginVM,
   ) = userAccountService.register(user.username!!, user.password!!).let {
     ResponseEntity.ok(it)
   }
@@ -45,7 +45,7 @@ class SystemApi(
   @DeleteMapping("/user/{id}")
   fun delete(
     @PathVariable
-    id: Long
+    id: Long,
   ) = userAccountService.deleteById(id)
 
 }
