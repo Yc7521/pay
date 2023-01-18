@@ -1,11 +1,14 @@
 package org.yc7521.pay.api
 
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.yc7521.pay.api.base.BaseApi
 import org.yc7521.pay.model.genPaymentCode
 import org.yc7521.pay.model.genReceiptCode
+import org.yc7521.pay.model.enums.UserType
 import org.yc7521.pay.repository.PayInfoRepository
 import org.yc7521.pay.repository.UserInfoRepository
 import org.yc7521.pay.service.UserAccountService
@@ -15,6 +18,7 @@ import java.math.BigDecimal
 
 @RestController
 @RequestMapping("/api/user")
+@Tag(name = "/Api/User/Info")
 @PreAuthorize("isAuthenticated()")
 class UserApi(
   private val userInfoRepository: UserInfoRepository,
@@ -28,6 +32,7 @@ class UserApi(
    * GET: get current user
    */
   @GetMapping("/me")
+  @Operation(summary = "Get user info by current user.")
   fun me() = ResponseEntity.ok(currentUserInfo)
 
 
@@ -35,12 +40,14 @@ class UserApi(
    * DELETE: delete current user
    */
   @DeleteMapping("/me")
+  @Operation(summary = "Delete current user.")
   fun deleteMe() = userAccountService.delete(currentUser)
 
   /**
    * PUT: change password
    */
   @PutMapping("/me/password")
+  @Operation(summary = "Change the password of current user.")
   fun changePassword(
     @RequestParam
     oldPassword: String,
@@ -52,6 +59,7 @@ class UserApi(
    * GET: get user by id
    */
   @GetMapping("/{id}")
+  @Operation(summary = "Get user info by user id.")
   fun get(
     @PathVariable
     id: Long,
@@ -63,6 +71,7 @@ class UserApi(
    * GET: gen payment code
    */
   @GetMapping("/me/payment-code")
+  @Operation(summary = "Gen payment code.")
   fun genPaymentCode() = ResponseEntity.ok(
     tradingCodeCache.put(currentUserInfo.genPaymentCode()).toVM()
   )
@@ -71,11 +80,12 @@ class UserApi(
    * GET: gen receipt code
    */
   @GetMapping("/me/receipt-code")
+  @Operation(summary = "Gen receipt code.")
   fun genReceiptCode(money: BigDecimal? = null) = ResponseEntity.ok(
-    tradingCodeCache.put(currentUserInfo.genReceiptCode(money = money)).toVM()
+    // TODO: need to check if current UserType is Business
+    currentUserInfo.let { 
+      tradingCodeCache.put(it.genReceiptCode(money = money), it.userType == UserType.Personal).toVM()
+    }
   )
 
 }
-
-
-

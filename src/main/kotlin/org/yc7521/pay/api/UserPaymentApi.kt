@@ -1,5 +1,7 @@
 package org.yc7521.pay.api
 
+import io.swagger.v3.oas.annotations.tags.Tag
+import io.swagger.v3.oas.annotations.Operation
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
@@ -14,6 +16,7 @@ import org.yc7521.pay.service.impl.*
 
 @RestController
 @RequestMapping("/api/user/me/pay")
+@Tag(name = "/Api/User/Pay")
 @PreAuthorize("isAuthenticated()")
 class UserPaymentApi(
   private val userInfoRepository: UserInfoRepository,
@@ -29,6 +32,7 @@ class UserPaymentApi(
    * @param size 每页数量
    */
   @GetMapping
+  @Operation(summary = "List all PayInfo.")
   fun list(
     page: Int = 0,
     size: Int = 10,
@@ -44,6 +48,7 @@ class UserPaymentApi(
    * 创建订单
    */
   @PostMapping("")
+  @Operation(summary = "Create PayInfo by userId.", description = "Pay to user")
   fun pay(
     @RequestBody
     payVM: PayVM,
@@ -60,6 +65,7 @@ class UserPaymentApi(
    * 支付
    */
   @PutMapping("{id}")
+  @Operation(summary = "Pay.", description = "Update PayInfo and UserInfo to finish this payment")
   fun pay(
     @PathVariable
     id: Long,
@@ -74,6 +80,7 @@ class UserPaymentApi(
    * PUT: cancel pay
    */
   @PutMapping("{id}/cancel")
+  @Operation(summary = "Cancel.", description = "Update PayInfo to cancel this payment")
   fun cancel(
     @PathVariable
     id: Long,

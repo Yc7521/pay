@@ -16,8 +16,8 @@ import java.util.List;
 
 import static org.yc7521.pay.config.JwtConstants.HEADER_STRING;
 
-@Configuration
-@EnableOpenApi
+// @Configuration
+// @EnableOpenApi
 public class SwaggerConfig {
   @Bean
   public Docket createRestApi() {

@@ -4,3 +4,8 @@ data class LoginVM(
   val username: String? = null,
   val password: String? = null,
 )
+
+data class LoginRes(
+  val msg: String? = null,
+  val id_token: String? = null,
+)
