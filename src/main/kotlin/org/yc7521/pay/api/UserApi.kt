@@ -64,7 +64,9 @@ class UserApi(
     @PathVariable
     id: Long,
   ) = ResponseEntity.ok(
-    userAccountService.findById(id).userInfo!!
+    userInfoRepository
+      .findById(id)
+      .orElseThrow { IllegalArgumentException("User not found") }
   )
 
   /**

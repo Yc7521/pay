@@ -31,9 +31,8 @@ class JwtAuthenticationFilter(authenticationManager: AuthenticationManager?) :
     }
     // 设置登录成功处理类
     setAuthenticationSuccessHandler { _: HttpServletRequest?, rep: HttpServletResponse, auth: Authentication ->
-      logger.info("login success")
       val userToken = auth.principal as UserToken
-      logger.info("Authorities: " + auth.authorities)
+      logger.info("${auth.name} login success; Authorities: " + auth.authorities)
       rep.contentType = "application/json;charset=utf-8"
       ResponseUtil.write(
         ok(

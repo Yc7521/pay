@@ -37,7 +37,7 @@ class JwtCheckAuthenticationFilter(
                 userDetails, authToken, userDetails.authorities
               )
               authentication.details = WebAuthenticationDetailsSource().buildDetails(req)
-              logger.info("Authenticated user $username, setting security context")
+              // logger.info("Authenticated user $username, setting security context")
               SecurityContextHolder.getContext().authentication = authentication
             }
           }
@@ -52,7 +52,7 @@ class JwtCheckAuthenticationFilter(
       chain.doFilter(req, res)
       return
     }
-    logger.warn("Couldn't find bearer string, will ignore the header")
+    // logger.warn("Couldn't find bearer string, will ignore the header")
     chain.doFilter(req, res)
   }
 }

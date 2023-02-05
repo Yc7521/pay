@@ -1,5 +1,6 @@
 package org.yc7521.pay.service.data
 
+import org.springframework.context.annotation.Scope
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest

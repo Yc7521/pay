@@ -30,11 +30,11 @@ open class PayInfo(
   open var money: BigDecimal? = null,
 
   @Column(name = "create_time")
-  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "GMT+8")
   open var create: LocalDateTime? = null,
 
   @Column(name = "finish_time")
-  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "GMT+8")
   open var finish: LocalDateTime? = null,
 
   @Column(name = "goods_info", length = 127)

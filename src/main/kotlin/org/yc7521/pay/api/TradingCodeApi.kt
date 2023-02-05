@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity
 import org.springframework.http.ResponseEntity.ok
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
+import org.yc7521.pay.util.log.annotation.Log
+import org.yc7521.pay.util.log.enums.BusinessType
 import org.yc7521.pay.api.base.BaseApi
 import org.yc7521.pay.model.TradingCode
 import org.yc7521.pay.service.data.TradingCodeCache
@@ -40,7 +42,8 @@ class TradingCodeApi(
   fun has(
     @PathVariable
     id: Long,
-  ) = ok(tradingCodeCache.has(id))
+  ): ResponseEntity<Any> =
+    if (tradingCodeCache.has(id)) ok().build() else ResponseEntity.notFound().build()
 
   @GetMapping("/user/{userId}")
   @Operation(summary = "List TradingCode by userId.")

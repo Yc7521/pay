@@ -46,7 +46,10 @@ class UserAccountServiceImpl(
           username = username,
           password = passwordEncoder.encode(password),
           userInfo = UserInfo(
-            money = 0.toBigDecimal(), credible = true, userType = UserType.Personal
+            nickname = username,
+            money = 0.toBigDecimal(),
+            credible = true,
+            userType = UserType.Personal
           )
         )
       )

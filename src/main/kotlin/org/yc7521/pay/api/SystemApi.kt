@@ -58,9 +58,7 @@ class SystemApi(
   fun register(
     @RequestBody
     user: LoginVM,
-  ) = userAccountService.register(user.username!!, user.password!!).let {
-    ResponseEntity.ok(it)
-  }
+  ) = ResponseEntity.ok(userAccountService.register(user.username!!, user.password!!))
 
   /**
    * DELETE: delete user

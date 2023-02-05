@@ -7,8 +7,16 @@ import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.transaction.annotation.Transactional
 import org.yc7521.pay.model.PayInfo
+import org.yc7521.pay.model.enums.PayState
+import java.time.LocalDateTime
 
 interface PayInfoRepository : JpaRepository<PayInfo, Long> {
+
+  @Transactional
+  @Modifying
+  @Query("delete from PayInfo p where p.state = ?1 and p.create < ?2")
+  fun deleteUnpaid(state: PayState, create: LocalDateTime): Int
+
   @Transactional
   @Modifying
   @Query("update PayInfo p set p.state = :#{#payInfo.state}, p.finish = :#{#payInfo.finish} where p.id = :#{#payInfo.id}")

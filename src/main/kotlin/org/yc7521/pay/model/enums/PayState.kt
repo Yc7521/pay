@@ -14,7 +14,7 @@ enum class PayState {
   /**
    * 已取消
    */
-  Cancelled,
+  Canceled,
 
   /**
    * 已退款

@@ -5,11 +5,11 @@ import org.yc7521.pay.model.UserAccount
 import org.yc7521.pay.model.UserInfo
 import org.yc7521.pay.model.UserToken
 import org.yc7521.pay.repository.UserRepository
+import org.yc7521.pay.util.autowired
 import javax.annotation.Resource
 
 open class BaseApi {
-  @Resource
-  private lateinit var userRepository: UserRepository
+  private val userRepository: UserRepository by autowired()
 
   val currentUser: UserAccount
     get() = userRepository

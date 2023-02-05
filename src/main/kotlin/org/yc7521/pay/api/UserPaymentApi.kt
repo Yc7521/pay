@@ -13,6 +13,7 @@ import org.yc7521.pay.model.vm.*
 import org.yc7521.pay.repository.*
 import org.yc7521.pay.service.data.TradingCodeCache
 import org.yc7521.pay.service.impl.*
+import java.math.BigDecimal
 
 @RestController
 @RequestMapping("/api/user/me/pay")
@@ -47,18 +48,52 @@ class UserPaymentApi(
    * POST: pay to user
    * 创建订单
    */
-  @PostMapping("")
+  @PostMapping("user")
   @Operation(summary = "Create PayInfo by userId.", description = "Pay to user")
-  fun pay(
+  fun createPayment(
     @RequestBody
     payVM: PayVM,
-  ) = try {
-    ResponseEntity.ok(
-      paymentService.createPayment(currentUserInfo.id!!, payVM.userId!!, payVM)
-    )
-  } catch (e: Exception) {
-    ResponseEntity.badRequest().body(e.message)
-  }
+  ) = ResponseEntity.ok(
+    paymentService.createPayment(currentUserInfo.id!!, payVM.userId!!, payVM)
+  )
+
+  /**
+   * POST: with trading code
+   * 创建订单
+   */
+  @PostMapping("code/{code}")
+  fun createPaymentWithCode(
+    @PathVariable
+    code: Long,
+    @RequestParam(required = false)
+    money: BigDecimal? = null,
+  ) = ResponseEntity.ok(
+    paymentService.createPayment(currentUserInfo.id!!, tradingCodeCache[code], money)
+  )
+
+  /**
+   * PUT: pay with trading code
+   * 支付
+   */
+  @PutMapping("code/{code}")
+  fun payWithCode(
+    @PathVariable
+    code: Long
+  ) = ResponseEntity.ok(
+    paymentService.pay(tradingCodeCache[code])
+  )
+
+  /**
+   * PUT: pay with trading code
+   * 支付
+   */
+  @PutMapping("code/{code}/cancel")
+  fun cancelWithCode(
+    @PathVariable
+    code: Long
+  ) = ResponseEntity.ok(
+    paymentService.cancel(tradingCodeCache[code])
+  )
 
   /**
    * PUT: pay
@@ -69,11 +104,9 @@ class UserPaymentApi(
   fun pay(
     @PathVariable
     id: Long,
-  ) = try {
+  ): ResponseEntity<PayInfo> {
     paymentService.checkPaymentPayer(currentUserInfo.id!!, id)
-    ResponseEntity.ok(paymentService.pay(id))
-  } catch (e: Exception) {
-    ResponseEntity.badRequest().body(e.message ?: "Unknown error")
+    return ResponseEntity.ok(paymentService.pay(id))
   }
 
   /**
@@ -84,10 +117,8 @@ class UserPaymentApi(
   fun cancel(
     @PathVariable
     id: Long,
-  ) = try {
+  ): ResponseEntity<PayInfo> {
     paymentService.checkPaymentPayer(currentUserInfo.id!!, id)
-    ResponseEntity.ok(paymentService.cancel(id))
-  } catch (e: Exception) {
-    ResponseEntity.badRequest().body(e.message ?: "Unknown error")
+    return ResponseEntity.ok(paymentService.cancel(id))
   }
 }

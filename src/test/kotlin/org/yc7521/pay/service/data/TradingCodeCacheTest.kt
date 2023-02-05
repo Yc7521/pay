@@ -9,27 +9,20 @@ import org.yc7521.pay.model.genPaymentCode
 import org.yc7521.pay.model.genReceiptCode
 import org.yc7521.pay.service.UserAccountService
 import org.yc7521.pay.service.impl.PaymentServiceImpl
+import org.yc7521.pay.util.autowired
 import java.util.concurrent.Future
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
-import javax.annotation.Resource
 
 @SpringBootTest
 class TradingCodeCacheTest {
   private val logger = Logger.getLogger(this.javaClass.name)
 
-  @Resource
-  private lateinit var cache: TradingCodeCache
-
-  @Resource
-  private lateinit var executor: ScheduledExecutorService
-
-  @Resource
-  private lateinit var userAccountService: UserAccountService
-
-  @Resource
-  private lateinit var paymentService: PaymentServiceImpl
+  private val cache: TradingCodeCache by autowired()
+  private val executor: ScheduledExecutorService by autowired()
+  private val userAccountService: UserAccountService by autowired()
+  private val paymentService: PaymentServiceImpl by autowired()
 
   private fun setTimeout(
     ms: Long,

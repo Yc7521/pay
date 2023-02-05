@@ -12,6 +12,9 @@ open class UserInfo(
   @Column(name = "id", nullable = false)
   open var id: Long? = null,
 
+  @Column(name = "nickname", nullable = false, length = 31)
+  open var nickname: String? = null,
+
   @Column(name = "money", nullable = false, precision = 19, scale = 4)
   open var money: BigDecimal? = null,
 
@@ -22,3 +25,4 @@ open class UserInfo(
   @Column(name = "user_type", nullable = false)
   open var userType: UserType? = null,
 )
+

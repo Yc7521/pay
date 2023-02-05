@@ -70,6 +70,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
       // 设置 OPTIONS 尝试请求直接通过
       .antMatchers(HttpMethod.OPTIONS, "/**")
       .permitAll()
+      .antMatchers("/swagger-ui/**", "/v3/api-docs/**")
+      .permitAll()
       .antMatchers("/api/sys/**")
       .authenticated()
       // 注意使用 hasAnyAuthority 角色需要以 ROLE_ 开头

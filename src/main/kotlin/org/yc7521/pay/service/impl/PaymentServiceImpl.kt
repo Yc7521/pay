@@ -146,9 +146,13 @@ class PaymentServiceImpl(
     .let {
       if (it.state != PayState.Unpaid) throw Exception("Can't cancel")
       it.finish = LocalDateTime.now()
-      it.state = PayState.Cancelled
+      it.state = PayState.Canceled
       payInfoRepository.updateState(it)
       payInfoRepository.findById(it.id!!).orElseThrow { Exception("PayInfo not found") }
     }
 
+  /**
+   * 删除一小时前所有未支付的交易记录
+   */
+  fun deleteUnpaid() = payInfoRepository.deleteUnpaid(PayState.Unpaid, LocalDateTime.now().minusHours(1))
 }
