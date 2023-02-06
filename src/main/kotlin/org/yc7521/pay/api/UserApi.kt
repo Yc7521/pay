@@ -91,7 +91,6 @@ class UserApi(
    * GET: get user by id
    */
   @GetMapping("/{id}")
-  @PreAuthorize("hasRole('admin')")
   @Operation(summary = "Get user info by user id.")
   fun get(
     @PathVariable

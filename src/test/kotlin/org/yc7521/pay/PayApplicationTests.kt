@@ -78,9 +78,9 @@ class PayApplicationTests {
   @Test
   fun changeNickname() {
     val u1 = login(LoginVM("1", "1"))
-    mockMvc.put("/api/user/me/nickname") {
+    mockMvc.put("/api/user/me") {
       param("nickname", "new nickname")
-      header("Authorization", u1)
+      header("Authorization", "Bearer $u1")
     }.andExpect {
       status {
         isOk()
@@ -184,7 +184,6 @@ class PayApplicationTests {
     arrayOf(u1Code(), u2Pay(true)).forEach { it.await() }
     arrayOf(u1Code(), u2Pay(false)).forEach { it.await() }
   }
-
 
   private fun payment_code(
     payment: String = "payment",
