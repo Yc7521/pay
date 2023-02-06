@@ -6,12 +6,13 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirements
 import io.swagger.v3.oas.annotations.tags.Tag
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.yc7521.pay.model.vm.LoginRes
 import org.yc7521.pay.model.vm.LoginVM
 import org.yc7521.pay.service.UserAccountService
+import javax.annotation.security.PermitAll
 
 @RestController
 @RequestMapping("/api")
@@ -24,6 +25,7 @@ class SystemApi(
    */
   @PostMapping("/login")
   @SecurityRequirements
+  @PermitAll
   @Operation(
     summary = "Login.",
     responses = [
@@ -44,7 +46,16 @@ class SystemApi(
    */
   @GetMapping("/logout")
   @SecurityRequirements
-  @Operation(summary = "Logout.")
+  @PermitAll
+  @Operation(
+    summary = "Logout.",
+    responses = [
+      ApiResponse(
+        content = [
+          Content(schema = Schema(implementation = String::class)),
+        ]
+      )]
+  )
   fun logout() {
   }
 
@@ -54,6 +65,7 @@ class SystemApi(
    */
   @PostMapping("/register")
   @SecurityRequirements
+  @PermitAll
   @Operation(summary = "Register.")
   fun register(
     @RequestBody
@@ -65,7 +77,7 @@ class SystemApi(
    */
   @DeleteMapping("/user/{id}")
   @Operation(summary = "Delete user.")
-  @PreAuthorize("hasAuthority('role_admin')")
+  @PreAuthorize("hasRole('admin')")
   fun delete(
     @PathVariable
     id: Long,

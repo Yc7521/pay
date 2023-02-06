@@ -1,7 +1,7 @@
 package org.yc7521.pay.api
 
-import io.swagger.v3.oas.annotations.tags.Tag
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.ResponseEntity
 import org.springframework.http.ResponseEntity.ok
@@ -16,13 +16,12 @@ import org.yc7521.pay.service.data.TradingCodeCache
 @RestController
 @RequestMapping("/api/code")
 @Tag(name = "/Api/Trading Code")
-@PreAuthorize("isAuthenticated()")
 class TradingCodeApi(
   private val tradingCodeCache: TradingCodeCache,
 ) : BaseApi() {
   @GetMapping
   @Operation(summary = "List all TradingCode.")
-  @PreAuthorize("hasAuthority('role_admin')")
+  @PreAuthorize("hasRole('admin')")
   fun list(
     @RequestParam("page", defaultValue = "0")
     page: Int = 0,
@@ -73,6 +72,6 @@ class TradingCodeApi(
    */
   @GetMapping("/getId")
   @Operation(summary = "Gen id, only test for admin users.")
-  @PreAuthorize("hasAuthority('role_admin')")
+  @PreAuthorize("hasRole('admin')")
   fun getId() = ok(tradingCodeCache.getId())
 }

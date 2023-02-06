@@ -12,7 +12,7 @@ open class UserInfo(
   @Column(name = "id", nullable = false)
   open var id: Long? = null,
 
-  @Column(name = "nickname", nullable = false, length = 31)
+  @Column(name = "nickname", nullable = false, length = 63)
   open var nickname: String? = null,
 
   @Column(name = "money", nullable = false, precision = 19, scale = 4)
@@ -24,5 +24,7 @@ open class UserInfo(
   @Enumerated(EnumType.STRING)
   @Column(name = "user_type", nullable = false)
   open var userType: UserType? = null,
-)
 
+  @Column(name = "deleted")
+  open var deleted: Boolean? = false,
+)

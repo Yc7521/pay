@@ -1,8 +1,12 @@
 package org.yc7521.pay.config;
 
+import com.google.gson.JsonParseException;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -13,6 +17,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -27,6 +32,7 @@ import org.yc7521.pay.service.TokenService;
 
 import javax.annotation.Resource;
 import javax.servlet.Filter;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import static org.yc7521.pay.util.ResponseUtil.write;
@@ -42,7 +48,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   @Resource
   private UserDetailsService userDetailsService;
   @Resource
-  private TokenService       tokenService;
+  private TokenService tokenService;
 
   // 配置密码加密器
   @Bean
@@ -74,10 +80,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
       .permitAll()
       .antMatchers("/api/sys/**")
       .authenticated()
-      // 注意使用 hasAnyAuthority 角色需要以 ROLE_ 开头
-      //      .antMatchers("/api/demo/admin").hasAnyAuthority("ROLE_admin")
-      .anyRequest()
+      .antMatchers("/api/login", "/api/register", "/api/logout")
       .permitAll()
+      // .antMatchers("/api/demo/admin").hasAnyRole("admin")
+      .anyRequest()
+      .authenticated()
       .and()
       //禁用 CSRF,不然post调试的时候都403
       .csrf()
@@ -97,12 +104,45 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         write(ResponseEntity.ok("logout success"), response);
       })
       .and()
+      .exceptionHandling(hs -> {
+        hs.accessDeniedHandler((req, response, accessDeniedException) -> {
+          Object obj = req.getAttribute("exception");
+          String msg = obj instanceof Exception ? ((Exception) obj).getMessage() : "forbidden";
+          if (obj instanceof ExpiredJwtException ||
+              obj instanceof SignatureException  ||
+              obj instanceof JsonParseException) {
+            write(ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("msg", msg)),
+              response);
+          } else {
+            write(ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(Map.of("msg", msg)),
+              response);
+          }
+        });
+        hs.authenticationEntryPoint((req, response, authException) -> {
+          Object obj = req.getAttribute("exception");
+          String msg = obj instanceof Exception ? ((Exception) obj).getMessage() : "unauthorized";
+          write(ResponseEntity
+              .status(HttpStatus.UNAUTHORIZED)
+              .body(Map.of("msg", msg)),
+            response);
+        });
+      })
     // 开启表单登录
     // .formLogin().permitAll()
     // .and()
     // 开启注销
     // .logout().permitAll()
     ;
+  }
+
+  @Bean
+  GrantedAuthorityDefaults grantedAuthorityDefaults() {
+    // Remove the ROLE_ prefix
+    return new GrantedAuthorityDefaults("");
   }
 
   /**

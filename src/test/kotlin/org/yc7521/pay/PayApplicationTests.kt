@@ -76,6 +76,32 @@ class PayApplicationTests {
   }
 
   @Test
+  fun changeNickname() {
+    val u1 = login(LoginVM("1", "1"))
+    mockMvc.put("/api/user/me/nickname") {
+      param("nickname", "new nickname")
+      header("Authorization", u1)
+    }.andExpect {
+      status {
+        isOk()
+      }
+      content {
+        contentTypeCompatibleWith("application/json")
+        jsonPath("$.nickname") {
+          isString()
+          value("new nickname")
+        }
+      }
+    }.andDo {
+      handle { res ->
+        res.response.contentAsString.let {
+          logger.info(it)
+        }
+      }
+    }
+  }
+
+  @Test
   fun u1CodeTest() {
     runBlocking(Dispatchers.IO) {
       loginAsync("1", "1") { u1 ->

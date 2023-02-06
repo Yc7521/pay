@@ -1,5 +1,6 @@
 package org.yc7521.pay.filter
 
+import com.google.gson.JsonParseException
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.security.SignatureException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -31,12 +32,14 @@ class JwtCheckAuthenticationFilter(
       try {
         tokenService.getUsernameFromToken(authToken)?.let { username ->
           if (SecurityContextHolder.getContext().authentication == null) {
-            val userDetails = userDetailsService.loadUserByUsername(username) as UserToken
+            val userDetails =
+              userDetailsService.loadUserByUsername(username) as UserToken
             if (tokenService.validateToken(authToken, userDetails)) {
               val authentication = UsernamePasswordAuthenticationToken(
                 userDetails, authToken, userDetails.authorities
               )
-              authentication.details = WebAuthenticationDetailsSource().buildDetails(req)
+              authentication.details =
+                WebAuthenticationDetailsSource().buildDetails(req)
               // logger.info("Authenticated user $username, setting security context")
               SecurityContextHolder.getContext().authentication = authentication
             }
@@ -44,10 +47,18 @@ class JwtCheckAuthenticationFilter(
         }
       } catch (e: IllegalArgumentException) {
         logger.error("An error occurred during getting username from token", e)
+        req.setAttribute("exception", e)
       } catch (e: ExpiredJwtException) {
         logger.warn("The token is expired and not valid anymore", e)
+        req.setAttribute("exception", e)
       } catch (e: SignatureException) {
         logger.error("Authentication Failed. Username or Password not valid.")
+        req.setAttribute("exception", e)
+      } catch (e: JsonParseException) {
+        logger.error("Json parse error.", e)
+        req.setAttribute("exception", e)
+      } catch (e: Exception) {
+        logger.error("Error[${e.javaClass.name}]: ${e.message}", e)
       }
       chain.doFilter(req, res)
       return

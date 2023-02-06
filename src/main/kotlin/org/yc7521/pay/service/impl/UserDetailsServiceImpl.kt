@@ -1,5 +1,6 @@
 package org.yc7521.pay.service.impl
 
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.stereotype.Service
@@ -34,6 +35,6 @@ class UserDetailsServiceImpl : UserDetailsService {
    *  封装认证需要的UserDetails该用户的用户名、密码、角色
    */
   fun createUser(user: UserAccount): UserDetails {
-    return UserToken(user, user.userInfo?.userType?.role ?: "role_user")
+    return UserToken(user)
   }
 }

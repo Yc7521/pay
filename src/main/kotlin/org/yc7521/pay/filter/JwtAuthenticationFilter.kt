@@ -27,7 +27,7 @@ class JwtAuthenticationFilter(authenticationManager: AuthenticationManager?) :
     // 设置登录失败处理类
     setAuthenticationFailureHandler { _: HttpServletRequest?, rep: HttpServletResponse, e: AuthenticationException ->
       logger.info("login failed")
-      ResponseUtil.write(ok(mapOf("message" to e.message)), rep)
+      ResponseUtil.write(ok(mapOf("msg" to e.message)), rep)
     }
     // 设置登录成功处理类
     setAuthenticationSuccessHandler { _: HttpServletRequest?, rep: HttpServletResponse, auth: Authentication ->
@@ -37,7 +37,8 @@ class JwtAuthenticationFilter(authenticationManager: AuthenticationManager?) :
       ResponseUtil.write(
         ok(
           mapOf(
-            "msg" to "${auth.name} 登录成功！", "id_token" to userToken.token
+            "msg" to "${auth.name} 登录成功！",
+            "id_token" to userToken.token,
           )
         ), rep
       )

@@ -7,10 +7,10 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 
 public class JwtConstants {
-  public static final long      ACCESS_TOKEN_VALIDITY_SECONDS = 30 * 60;
+  public static final long      ACCESS_TOKEN_VALIDITY_SECONDS = 30 * 24 * 60 * 60;
   public static final SecretKey SIGNING_KEY                   =
     new SecretKeySpec(
-      fillKey("web-course-account-api"),
+      fillKey("payment-api"),
       SignatureAlgorithm.HS256.getJcaName()
     );
   public static final String    TOKEN_PREFIX                  = "Bearer ";

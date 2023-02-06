@@ -1,6 +1,8 @@
 package org.yc7521.pay.model
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import org.hibernate.annotations.OnDelete
+import org.hibernate.annotations.OnDeleteAction
 import org.yc7521.pay.model.enums.PayState
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -14,11 +16,13 @@ open class PayInfo(
   @Column(name = "id", nullable = false)
   open var id: Long? = null,
 
-  @ManyToOne
+  @ManyToOne(cascade = [CascadeType.REMOVE])
+  @OnDelete(action = OnDeleteAction.CASCADE)
   @JoinColumn(name = "paying_user_id")
   open var payingUser: UserInfo? = null,
 
-  @ManyToOne
+  @ManyToOne(cascade = [CascadeType.REMOVE])
+  @OnDelete(action = OnDeleteAction.CASCADE)
   @JoinColumn(name = "receiving_user_id")
   open var receivingUser: UserInfo? = null,
 

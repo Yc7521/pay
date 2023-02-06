@@ -7,6 +7,7 @@ import org.yc7521.pay.model.UserInfo
 import org.yc7521.pay.model.enums.UserType
 import org.yc7521.pay.repository.UserRepository
 import org.yc7521.pay.service.UserAccountService
+import org.yc7521.pay.util.PayException
 
 
 @Service
@@ -18,7 +19,7 @@ class UserAccountServiceImpl(
    * find by id
    */
   override fun findById(id: Long): UserAccount {
-    return userRepository.findById(id).orElseThrow { RuntimeException("User not found") }
+    return userRepository.findById(id).orElseThrow { NoSuchElementException("User not found") }
   }
 
   /**
@@ -30,7 +31,7 @@ class UserAccountServiceImpl(
     }?.let {
       return it
     }
-    throw Exception("用户名或密码错误")
+    throw IllegalStateException("用户名或密码错误")
   }
 
   /**
@@ -38,7 +39,7 @@ class UserAccountServiceImpl(
    */
   override fun register(username: String, password: String): UserAccount {
     if (username.isBlank() || password.isBlank()) {
-      throw Exception("用户名或密码不能为空")
+      throw IllegalStateException("用户名或密码不能为空")
     }
     if (userRepository.findAllByUsername(username).isEmpty()) {
       return userRepository.save(
@@ -49,12 +50,12 @@ class UserAccountServiceImpl(
             nickname = username,
             money = 0.toBigDecimal(),
             credible = true,
-            userType = UserType.Personal
-          )
+            userType = UserType.Personal,
+          ),
         )
       )
     }
-    throw Exception("用户名已存在")
+    throw IllegalStateException("用户名已存在")
   }
 
   /**
@@ -79,7 +80,7 @@ class UserAccountServiceImpl(
       it.password = passwordEncoder.encode(newPassword)
       userRepository.save(it)
     } else {
-      throw Exception("旧密码错误")
+      throw IllegalStateException("旧密码错误")
     }
   }
 }

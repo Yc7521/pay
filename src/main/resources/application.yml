@@ -1,12 +1,6 @@
-springdoc:
-  packages-to-scan: org.yc7521.pay.api
-  paths-to-match: /api/**
-  swagger-ui:
-    persist-authorization: true
-
 spring:
   profiles:
     active: dev
 server:
   port: 8080
-debug: false
+debug: true

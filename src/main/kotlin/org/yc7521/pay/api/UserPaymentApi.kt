@@ -1,7 +1,7 @@
 package org.yc7521.pay.api
 
-import io.swagger.v3.oas.annotations.tags.Tag
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
@@ -18,7 +18,6 @@ import java.math.BigDecimal
 @RestController
 @RequestMapping("/api/user/me/pay")
 @Tag(name = "/Api/User/Pay")
-@PreAuthorize("isAuthenticated()")
 class UserPaymentApi(
   private val userInfoRepository: UserInfoRepository,
   private val payInfoRepository: PayInfoRepository,
@@ -104,10 +103,10 @@ class UserPaymentApi(
   fun pay(
     @PathVariable
     id: Long,
-  ): ResponseEntity<PayInfo> {
-    paymentService.checkPaymentPayer(currentUserInfo.id!!, id)
-    return ResponseEntity.ok(paymentService.pay(id))
-  }
+  ): ResponseEntity<PayInfo> =
+    paymentService.checkPaymentPayer(currentUserInfo.id!!, id).let {
+      return ResponseEntity.ok(paymentService.pay(id))
+    }
 
   /**
    * PUT: cancel pay
@@ -117,8 +116,8 @@ class UserPaymentApi(
   fun cancel(
     @PathVariable
     id: Long,
-  ): ResponseEntity<PayInfo> {
-    paymentService.checkPaymentPayer(currentUserInfo.id!!, id)
-    return ResponseEntity.ok(paymentService.cancel(id))
-  }
+  ): ResponseEntity<PayInfo> =
+    paymentService.checkPaymentPayer(currentUserInfo.id!!, id).let {
+      return ResponseEntity.ok(paymentService.cancel(id))
+    }
 }

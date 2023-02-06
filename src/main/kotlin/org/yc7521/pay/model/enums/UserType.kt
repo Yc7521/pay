@@ -1,7 +1,15 @@
 package org.yc7521.pay.model.enums
 
-enum class UserType(var role: String) {
-  Personal("role_personal"),
-  Business("role_business"),
-  Admin("role_admin");
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+
+enum class UserType() {
+  Personal,
+  Business,
+  Admin;
+
+  fun getSimpleGrantedAuthority() = when (this) {
+    Personal -> SimpleGrantedAuthority("personal")
+    Business -> SimpleGrantedAuthority("business")
+    Admin -> SimpleGrantedAuthority("admin")
+  }
 }
