@@ -8,7 +8,7 @@ import javax.persistence.*
 @Entity
 @Table(
   name = "user",
-  indexes = [Index(name = "idx_useraccount_username", columnList = "username")]
+  indexes = [Index(name = "idx_account_username", columnList = "username")]
 )
 open class UserAccount(
   @Id

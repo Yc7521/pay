@@ -1,5 +1,6 @@
 package org.yc7521.pay
 
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -66,12 +67,40 @@ class RegisterTests {
     }
   }
 
+  @ParameterizedTest()
+  @MethodSource("registerProvider")
+  fun login(loginVM: LoginVM) {
+    mockMvc.post("/api/login") {
+      param("username", loginVM.username!!)
+      param("password", loginVM.password!!)
+    }.andExpect {
+      status {
+        isOk()
+      }
+      content {
+        contentTypeCompatibleWith("application/json")
+        jsonPath("$.msg") {
+          isString()
+        }
+        jsonPath("$.id_token") {
+          isString()
+        }
+      }
+    }.andDo {
+      handle { res ->
+        res.response.contentAsString.let {
+          logger.info(it)
+        }
+      }
+    }
+  }
+
   companion object {
     @JvmStatic
     fun registerProvider(): List<LoginVM> = listOf(
+      LoginVM("admin", "admin"),
       LoginVM("1", "1"),
       LoginVM("2", "2"),
     )
   }
-
 }

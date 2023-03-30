@@ -34,15 +34,15 @@ class RoleRequestServiceImpl(
    * 列出所有申请
    * @param state 申请状态
    */
-  fun getRoleRequestByState(state: RoleRequestState) =
-    roleRequestRepository.findAllByState(state)
+  fun getRoleRequestByState(state: RoleRequestState, page: PageRequest) =
+    roleRequestRepository.findAllByState(state, page)
 
   /**
    * 列出所有申请
    * @param id 用户id
    */
-  fun getRoleRequestByApplicantId(id: Long) =
-    roleRequestRepository.findAllByApplicantId(id)
+  fun getRoleRequestByApplicantId(id: Long, page: PageRequest) =
+    roleRequestRepository.findAllByApplicantId(id, page)
 
   /**
    * 申请商家身份
@@ -69,7 +69,7 @@ class RoleRequestServiceImpl(
     role: UserType = UserType.Business,
     remarks: String = "",
   ): RoleRequest {
-    val roleRequest = getRoleRequestByApplicantId(currentUser.id!!)
+    val roleRequest = roleRequestRepository.findAllByApplicantId(currentUser.id!!)
     return when {
       currentUser.credible == false ->
         throw IllegalStateException("You are not credible")
@@ -147,4 +147,5 @@ class RoleRequestServiceImpl(
         roleRequest.approver = approver
         roleRequestRepository.save(roleRequest)
       }
+
 }

@@ -12,10 +12,10 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
-// const val CACHE_EXPIRE_TIME = 3L
-// val CACHE_EXPIRE_TIMEUNIT = TimeUnit.MINUTES
-const val CACHE_EXPIRE_TIME = 2L
-val CACHE_EXPIRE_TIMEUNIT = TimeUnit.SECONDS
+const val CACHE_EXPIRE_TIME = 3L
+val CACHE_EXPIRE_TIMEUNIT = TimeUnit.MINUTES
+// const val CACHE_EXPIRE_TIME = 2L
+// val CACHE_EXPIRE_TIMEUNIT = TimeUnit.SECONDS
 
 @Service
 class TradingCodeCache(
@@ -32,46 +32,47 @@ class TradingCodeCache(
   }
 
 
-  operator fun set(id: Long, code: TradingCode) {
+  operator fun set(id: String, code: TradingCode) {
     code.id = id
-    cache[id] = code
+    val num = id.toLong()
+    cache[num] = code
     executor.schedule({
       if (has(id)) {
-        cache.remove(id)
+        cache.remove(num)
       }
     }, CACHE_EXPIRE_TIME, CACHE_EXPIRE_TIMEUNIT)
   }
 
-  operator fun get(id: Long): TradingCode = cache[id] ?: throw NoSuchElementException()
+  operator fun get(id: String): TradingCode = cache[id.toLong()] ?: throw NoSuchElementException()
 
-  fun has(id: Long): Boolean = cache.containsKey(id)
+  fun has(id: String): Boolean = cache.containsKey(id.toLong())
 
   fun getByUserId(userId: Long): TradingCode? =
     cache.values.find { it.userInfoId == userId }
 
-  fun put(code: TradingCode, unique: Boolean = true) = (code.id ?: getId()).let { id ->
+  fun put(code: TradingCode, unique: Boolean = true) = (code.id?.toLong() ?: getId()).let { id ->
     if (unique) {
       // remove old code if exists
       getByUserId(code.userInfoId!!)?.let {
-        cache.remove(it.id)
+        cache.remove(it.id?.toLong())
       }
     }
-    set(id, code)
+    set(id.toString(), code)
     code
   }
 
-  fun checkAndRemove(id: Long) {
+  fun checkAndRemove(id: String) {
     if (has(id)) {
       val code = get(id)
       if (code.state == CodeState.Finished || code.state == CodeState.Canceled) {
-        cache.remove(id)
+        cache.remove(id.toLong())
       } else throw IllegalStateException("Code is not finished or canceled")
     } else throw NoSuchElementException("Code not found")
   }
 
   fun getId(): Long {
     while (true) getRandomId().let {
-      if (!cache.contains(it)) return it
+      if (it > 0 && !cache.contains(it)) return it
     }
   }
 

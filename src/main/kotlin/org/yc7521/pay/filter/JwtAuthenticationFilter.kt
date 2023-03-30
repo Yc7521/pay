@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.yc7521.pay.model.UserToken
+import org.yc7521.pay.model.vm.LoginRes
 import org.yc7521.pay.model.vm.LoginVM
 import org.yc7521.pay.util.ResponseUtil
 import java.io.IOException
@@ -27,7 +28,7 @@ class JwtAuthenticationFilter(authenticationManager: AuthenticationManager?) :
     // 设置登录失败处理类
     setAuthenticationFailureHandler { _: HttpServletRequest?, rep: HttpServletResponse, e: AuthenticationException ->
       logger.info("login failed")
-      ResponseUtil.write(ok(mapOf("msg" to e.message)), rep)
+      ResponseUtil.write(ok(LoginRes(true, e.message)), rep)
     }
     // 设置登录成功处理类
     setAuthenticationSuccessHandler { _: HttpServletRequest?, rep: HttpServletResponse, auth: Authentication ->
@@ -35,12 +36,8 @@ class JwtAuthenticationFilter(authenticationManager: AuthenticationManager?) :
       logger.info("${auth.name} login success; Authorities: " + auth.authorities)
       rep.contentType = "application/json;charset=utf-8"
       ResponseUtil.write(
-        ok(
-          mapOf(
-            "msg" to "${auth.name} 登录成功！",
-            "id_token" to userToken.token,
-          )
-        ), rep
+        ok(LoginRes(false, "${auth.name} 登录成功！", userToken.token)),
+        rep
       )
     }
     setFilterProcessesUrl("/api/login")

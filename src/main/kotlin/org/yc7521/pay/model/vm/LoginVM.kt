@@ -6,6 +6,7 @@ data class LoginVM(
 )
 
 data class LoginRes(
+  val error: Boolean? = null,
   val msg: String? = null,
   val id_token: String? = null,
 )

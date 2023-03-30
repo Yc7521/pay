@@ -34,7 +34,9 @@ class UserPaymentApi(
   @GetMapping
   @Operation(summary = "List all PayInfo.")
   fun list(
+    @RequestParam(required = false, defaultValue = "0")
     page: Int = 0,
+    @RequestParam(required = false, defaultValue = "10")
     size: Int = 10,
   ) = ResponseEntity.ok(
     payInfoRepository.findAllByUserInfoId(
@@ -53,45 +55,45 @@ class UserPaymentApi(
     @RequestBody
     payVM: PayVM,
   ) = ResponseEntity.ok(
-    paymentService.createPayment(currentUserInfo.id!!, payVM.userId!!, payVM)
+    paymentService.createPayment(currentUserInfo.id!!, payVM.userId!!.toLong(), payVM)
   )
 
   /**
    * POST: with trading code
    * 创建订单
    */
-  @PostMapping("code/{code}")
+  @PostMapping("code/{codeId}")
   fun createPaymentWithCode(
     @PathVariable
-    code: Long,
+    codeId: String,
     @RequestParam(required = false)
     money: BigDecimal? = null,
   ) = ResponseEntity.ok(
-    paymentService.createPayment(currentUserInfo.id!!, tradingCodeCache[code], money)
+    paymentService.createPayment(currentUserInfo.id!!, tradingCodeCache[codeId], money)
   )
 
   /**
    * PUT: pay with trading code
    * 支付
    */
-  @PutMapping("code/{code}")
+  @PutMapping("code/{codeId}")
   fun payWithCode(
     @PathVariable
-    code: Long
+    codeId: String
   ) = ResponseEntity.ok(
-    paymentService.pay(tradingCodeCache[code])
+    paymentService.pay(tradingCodeCache[codeId])
   )
 
   /**
    * PUT: pay with trading code
    * 支付
    */
-  @PutMapping("code/{code}/cancel")
+  @PutMapping("code/{codeId}/cancel")
   fun cancelWithCode(
     @PathVariable
-    code: Long
+    codeId: String
   ) = ResponseEntity.ok(
-    paymentService.cancel(tradingCodeCache[code])
+    paymentService.cancel(tradingCodeCache[codeId])
   )
 
   /**

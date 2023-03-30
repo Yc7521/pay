@@ -27,20 +27,20 @@ class TradingCodeApi(
     page: Int = 0,
     @RequestParam("size", defaultValue = "10")
     size: Int = 10,
-  ) = ok(tradingCodeCache.list(PageRequest.of(page, size)))
+  ) = ok(tradingCodeCache.list(PageRequest.of(page, size)).map { it.toVM() })
 
   @GetMapping("/{id}")
   @Operation(summary = "Get a TradingCode by id.")
   fun get(
     @PathVariable
-    id: Long,
-  ) = ok(tradingCodeCache[id])
+    id: String,
+  ) = ok(tradingCodeCache[id].toVM())
 
   @GetMapping("/has/{id}")
   @Operation(summary = "Exist a TradingCode by id.")
   fun has(
     @PathVariable
-    id: Long,
+    id: String,
   ): ResponseEntity<Any> =
     if (tradingCodeCache.has(id)) ok().build() else ResponseEntity.notFound().build()
 
@@ -49,7 +49,7 @@ class TradingCodeApi(
   fun getByUserId(
     @PathVariable
     userId: Long,
-  ) = tradingCodeCache.getByUserId(userId)?.let { ok(it) } ?: ResponseEntity
+  ) = tradingCodeCache.getByUserId(userId)?.let { ok(it.toVM()) } ?: ResponseEntity
     .notFound()
     .build()
 
@@ -58,13 +58,13 @@ class TradingCodeApi(
   fun put(
     @RequestBody
     tradingCode: TradingCode,
-  ) = ok(tradingCodeCache.put(tradingCode))
+  ) = ok(tradingCodeCache.put(tradingCode).toVM())
 
   @DeleteMapping("/{id}")
   @Operation(summary = "Remove a TradingCode by id if it's Finished.")
   fun checkAndRemove(
     @PathVariable
-    id: Long,
+    id: String,
   ) = ok(tradingCodeCache.checkAndRemove(id))
 
   /**

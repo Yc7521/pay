@@ -54,7 +54,7 @@ enum class CodeState {
  * 交易码
  */
 open class TradingCode(
-  open var id: Long? = null,
+  open var id: String? = null,
   open var userInfoId: Long? = null,
   open var tradingType: TradingType? = null,
   open var money: BigDecimal? = null,
@@ -66,7 +66,7 @@ open class TradingCode(
 ) {
   fun toVM(): TradingCodeVM = TradingCodeVM(
     id = id,
-    userInfoId = userInfoId,
+    userInfoId = userInfoId.toString(),
     tradingType = tradingType,
     money = money,
   )
