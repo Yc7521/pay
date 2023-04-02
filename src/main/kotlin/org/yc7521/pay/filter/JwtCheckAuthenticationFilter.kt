@@ -12,7 +12,9 @@ import org.yc7521.pay.config.JwtConstants.HEADER_STRING
 import org.yc7521.pay.config.JwtConstants.TOKEN_PREFIX
 import org.yc7521.pay.model.UserToken
 import org.yc7521.pay.service.TokenService
+import org.yc7521.pay.util.autowired
 import java.io.IOException
+import java.util.*
 import javax.servlet.FilterChain
 import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
@@ -22,6 +24,8 @@ class JwtCheckAuthenticationFilter(
   private val userDetailsService: UserDetailsService,
   private val tokenService: TokenService,
 ) : OncePerRequestFilter() {
+  private val resourceBundle: ResourceBundle by autowired()
+
   @Throws(IOException::class, ServletException::class)
   override fun doFilterInternal(
     req: HttpServletRequest, res: HttpServletResponse, chain: FilterChain,

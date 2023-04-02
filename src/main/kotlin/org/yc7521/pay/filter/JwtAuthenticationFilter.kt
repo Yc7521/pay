@@ -8,18 +8,25 @@ import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
+import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.yc7521.pay.model.UserToken
 import org.yc7521.pay.model.vm.LoginRes
 import org.yc7521.pay.model.vm.LoginVM
 import org.yc7521.pay.util.ResponseUtil
+import org.yc7521.pay.util.autowired
 import java.io.IOException
+import java.util.*
 import java.util.logging.Logger
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-class JwtAuthenticationFilter(authenticationManager: AuthenticationManager?) :
+class JwtAuthenticationFilter(
+  authenticationManager: AuthenticationManager?,
+) :
   UsernamePasswordAuthenticationFilter(authenticationManager) {
+  private val resourceBundle: ResourceBundle by autowired()
+
   private val logger = Logger.getLogger(
     JwtAuthenticationFilter::class.java.name
   )
@@ -28,15 +35,39 @@ class JwtAuthenticationFilter(authenticationManager: AuthenticationManager?) :
     // 设置登录失败处理类
     setAuthenticationFailureHandler { _: HttpServletRequest?, rep: HttpServletResponse, e: AuthenticationException ->
       logger.info("login failed")
-      ResponseUtil.write(ok(LoginRes(true, e.message)), rep)
+      if (e is UsernameNotFoundException) {
+        ResponseUtil.write(
+          ok(
+            LoginRes(
+              true,
+              resourceBundle.getString("login.name_not_found")
+            )
+          ), rep
+        )
+      } else {
+        ResponseUtil.write(
+          ok(
+            LoginRes(
+              true,
+              resourceBundle.getString("login.failed")
+            )
+          ), rep
+        )
+      }
+      // ResponseUtil.write(ok(LoginRes(true, e.message)), rep)
     }
     // 设置登录成功处理类
     setAuthenticationSuccessHandler { _: HttpServletRequest?, rep: HttpServletResponse, auth: Authentication ->
       val userToken = auth.principal as UserToken
-      logger.info("${auth.name} login success; Authorities: " + auth.authorities)
-      rep.contentType = "application/json;charset=utf-8"
+      logger.info("${auth.name} login success; Authorities: ${auth.authorities}")
       ResponseUtil.write(
-        ok(LoginRes(false, "${auth.name} 登录成功！", userToken.token)),
+        ok(
+          LoginRes(
+            false,
+            resourceBundle.getString("login.success").format(auth.name),
+            userToken.token
+          )
+        ),
         rep
       )
     }

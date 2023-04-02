@@ -43,31 +43,33 @@ class TradingCodeCache(
     }, CACHE_EXPIRE_TIME, CACHE_EXPIRE_TIMEUNIT)
   }
 
-  operator fun get(id: String): TradingCode = cache[id.toLong()] ?: throw NoSuchElementException()
+  operator fun get(id: String): TradingCode =
+    cache[id.toLong()] ?: throw NoSuchElementException("\$Error.TradingCode.not_found")
 
   fun has(id: String): Boolean = cache.containsKey(id.toLong())
 
   fun getByUserId(userId: Long): TradingCode? =
     cache.values.find { it.userInfoId == userId }
 
-  fun put(code: TradingCode, unique: Boolean = true) = (code.id?.toLong() ?: getId()).let { id ->
-    if (unique) {
-      // remove old code if exists
-      getByUserId(code.userInfoId!!)?.let {
-        cache.remove(it.id?.toLong())
+  fun put(code: TradingCode, unique: Boolean = true) =
+    (code.id?.toLong() ?: getId()).let { id ->
+      if (unique) {
+        // remove old code if exists
+        getByUserId(code.userInfoId!!)?.let {
+          cache.remove(it.id?.toLong())
+        }
       }
+      set(id.toString(), code)
+      code
     }
-    set(id.toString(), code)
-    code
-  }
 
   fun checkAndRemove(id: String) {
     if (has(id)) {
       val code = get(id)
       if (code.state == CodeState.Finished || code.state == CodeState.Canceled) {
         cache.remove(id.toLong())
-      } else throw IllegalStateException("Code is not finished or canceled")
-    } else throw NoSuchElementException("Code not found")
+      } else throw IllegalStateException("\$Error.TradingCode.not_finished")
+    } else throw NoSuchElementException("\$Error.TradingCode.not_found")
   }
 
   fun getId(): Long {

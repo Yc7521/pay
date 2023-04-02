@@ -4,7 +4,7 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 
-class UserToken @JvmOverloads constructor(
+class UserToken(
   account: UserAccount,
   authorities: Collection<GrantedAuthority>,
 ) : User(account.username, account.password, authorities) {
@@ -28,12 +28,13 @@ class UserToken @JvmOverloads constructor(
    *
    * @param account 账户
    */
-  constructor(account: UserAccount) : this(account,
+  constructor(account: UserAccount) : this(
+    account,
     account.userInfo?.userType?.getSimpleGrantedAuthority()
       ?: SimpleGrantedAuthority("anonymous")
   )
 
   init {
-    id = account.id ?: throw IllegalArgumentException("User id cannot be null")
+    id = account.id ?: throw IllegalArgumentException("\$Error.UserToken.null_id")
   }
 }

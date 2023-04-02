@@ -1,14 +1,14 @@
 package org.yc7521.pay.service.impl
 
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
 import org.yc7521.pay.model.UserAccount
 import org.yc7521.pay.model.UserToken
 import org.yc7521.pay.repository.UserRepository
+import java.util.ResourceBundle
 import javax.annotation.Resource
-import javax.persistence.EntityNotFoundException
 
 /*
  * UserDetailsService接口实现
@@ -17,6 +17,9 @@ import javax.persistence.EntityNotFoundException
 class UserDetailsServiceImpl : UserDetailsService {
   @Resource
   private val accountService: UserRepository? = null
+
+  @Resource
+  private lateinit var resourceBundle: ResourceBundle
 
   /*
    *  通过用户名称，查找用户信息，认证相关的逻辑都在loadUserByUsername方法中进行
@@ -28,7 +31,11 @@ class UserDetailsServiceImpl : UserDetailsService {
       createUser(it)
     }
       ?: // 如果没找到用户信息，抛出用户没找到异常
-      throw EntityNotFoundException("name：$username not found")
+      throw UsernameNotFoundException(
+        resourceBundle
+          .getString("Error.login.name_not_found")
+          .format(username)
+      )
   }
 
   /*

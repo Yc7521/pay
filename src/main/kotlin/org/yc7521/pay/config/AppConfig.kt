@@ -25,7 +25,7 @@ class AppConfig {
    */
   @Bean
   @RequestScope
-  fun messages(httpRequest: HttpServletRequest): ResourceBundle =
+  fun resourceBundle(httpRequest: HttpServletRequest): ResourceBundle =
     ResourceBundle.getBundle("i18n/messages", httpRequest.locale)
 
   @Bean

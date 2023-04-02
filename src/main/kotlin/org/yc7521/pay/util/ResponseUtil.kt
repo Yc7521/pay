@@ -17,11 +17,12 @@ object ResponseUtil {
       }
     }
     servletResponse.status = responseEntity.statusCodeValue
+    servletResponse.contentType = "application/json"
+    servletResponse.characterEncoding = "UTF-8"
     ObjectMapper().writeValueAsString(responseEntity.body)?.let { body ->
       OutputStreamWriter(
         servletResponse.outputStream, Charsets.UTF_8
       ).use { it.write(body) }
     }
-    servletResponse.characterEncoding = "UTF-8"
   }
 }

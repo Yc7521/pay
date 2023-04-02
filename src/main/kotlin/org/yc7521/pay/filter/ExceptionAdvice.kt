@@ -7,14 +7,39 @@ import org.springframework.validation.ObjectError
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
+import org.yc7521.pay.model.vm.ErrorVM
 import org.yc7521.pay.util.PayException
+import java.util.*
 import java.util.stream.Collectors
+import kotlin.NoSuchElementException
 
 @ControllerAdvice
 class ExceptionAdvice(
   @Value("\${debug:false}")
   private val debug: Boolean,
+  private val resourceBundle: ResourceBundle,
 ) {
+  private final fun getMessage(e: Exception): String =
+    e.message?.let {
+      if (it.startsWith("\$"))
+        resourceBundle.getString(it.substring(1))
+      else
+        it
+    } ?: ""
+
+  private final fun getErrorVM(e: Exception): ErrorVM =
+    if (debug)
+      ErrorVM(
+        getMessage(e),
+        e::class.simpleName ?: "",
+        e.stackTrace.map { it.toString() }
+      )
+    else
+      ErrorVM(
+        getMessage(e),
+        e::class.simpleName ?: ""
+      )
+
   @ExceptionHandler(
     MethodArgumentNotValidException::class
   )
@@ -25,26 +50,16 @@ class ExceptionAdvice(
       .collect(Collectors.joining())
     return ResponseEntity
       .badRequest()
-      .body(mapOf("msg" to message, "type" to e::class.simpleName))
+      .body(
+        ErrorVM(message, e::class.simpleName ?: "")
+      )
   }
 
   @ExceptionHandler(value = [NullPointerException::class])
   fun process(e: NullPointerException): ResponseEntity<*> =
     ResponseEntity
       .internalServerError()
-      .body(
-        if (debug)
-          mapOf(
-            "msg" to "${e.message}",
-            "stack" to e.stackTrace.map { it.toString() }.toList(),
-            "type" to e::class.simpleName,
-          )
-        else
-          mapOf(
-            "msg" to "${e.message}",
-            "type" to e::class.simpleName,
-          )
-      )
+      .body(getErrorVM(e))
 
   @ExceptionHandler(
     value = [
@@ -57,10 +72,5 @@ class ExceptionAdvice(
   fun process(e: PayException): ResponseEntity<*> =
     ResponseEntity
       .badRequest()
-      .body(
-        mapOf(
-          "msg" to "${e.message}",
-          "type" to e::class.simpleName,
-        )
-      )
+      .body(getErrorVM(e))
 }

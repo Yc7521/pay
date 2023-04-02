@@ -11,6 +11,7 @@ import io.swagger.v3.oas.models.security.SecurityScheme.In
 import org.springdoc.core.customizers.OpenApiCustomiser
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.yc7521.pay.model.vm.ErrorVM
 
 
 @Configuration
@@ -55,10 +56,10 @@ class OpenApiConfig {
                     .addMediaType(
                       "application/json",
                       MediaType().schema(
-                        MapSchema().properties(
+                        ObjectSchema().properties(
                           mapOf(
-                            "msg" to StringSchema(),
-                            "type" to StringSchema(),
+                            ErrorVM::message.name to StringSchema(),
+                            ErrorVM::type.name to StringSchema(),
                           )
                         )
                       )
@@ -74,11 +75,13 @@ class OpenApiConfig {
                     .addMediaType(
                       "application/json",
                       MediaType().schema(
-                        MapSchema().properties(
+                        ObjectSchema().properties(
                           mapOf(
-                            "msg" to StringSchema(),
-                            "stack" to ArraySchema().items(StringSchema()),
-                            "type" to StringSchema(),
+                            ErrorVM::message.name to StringSchema(),
+                            ErrorVM::stack.name to ArraySchema()
+                              .items(StringSchema())
+                              .nullable(true),
+                            ErrorVM::type.name to StringSchema(),
                           )
                         )
                       )

@@ -34,7 +34,7 @@ class TradingCodeApi(
   fun get(
     @PathVariable
     id: String,
-  ) = ok(tradingCodeCache[id].toVM())
+  ) = ok(tradingCodeCache[id])
 
   @GetMapping("/has/{id}")
   @Operation(summary = "Exist a TradingCode by id.")
