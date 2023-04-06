@@ -71,7 +71,7 @@ class PayApplicationTests {
     func: suspend (token: String) -> Unit,
   ) = async {
     val token = login(LoginVM(username, password))
-    hasCode(0, token, false)
+    hasCode("0", token, false)
     func(token)
   }
 
@@ -225,7 +225,7 @@ class PayApplicationTests {
   }
 
   private fun hasCode(
-    id: Long,
+    id: String,
     token: String,
     exists: Boolean = true,
   ) {
@@ -242,7 +242,7 @@ class PayApplicationTests {
   }
 
   private fun getCode(
-    id: Long,
+    id: String,
     token: String,
     log: Boolean = false,
   ): TradingCode {
@@ -265,7 +265,7 @@ class PayApplicationTests {
   }
 
   private fun deleteCode(
-    id: Long,
+    id: String,
     token: String,
   ) {
     mockMvc.delete("/api/code/$id") {
@@ -274,7 +274,7 @@ class PayApplicationTests {
   }
 
   private fun createPayment(
-    code: Long,
+    code: String,
     token: String,
     money: BigDecimal? = null,
   ): PayInfo {
@@ -322,7 +322,7 @@ class PayApplicationTests {
     return payInfo!!
   }
 
-  private fun pay(id: Long, token: String) {
+  private fun pay(id: String, token: String) {
     mockMvc.put("/api/user/me/pay/code/$id") {
       header("Authorization", "Bearer $token")
     }.andExpect {
@@ -362,7 +362,7 @@ class PayApplicationTests {
     }
   }
 
-  private fun cancel(id: Long, token: String) {
+  private fun cancel(id: String, token: String) {
     mockMvc.put("/api/user/me/pay/code/$id/cancel") {
       header("Authorization", "Bearer $token")
     }.andExpect {
