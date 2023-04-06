@@ -8,7 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.yc7521.pay.api.base.BaseApi
 import org.yc7521.pay.model.enums.RoleRequestState
-import org.yc7521.pay.model.vm.RequestReq
+import org.yc7521.pay.model.vm.RoleReq
 import org.yc7521.pay.service.impl.RoleRequestServiceImpl
 import javax.validation.Valid
 
@@ -98,7 +98,7 @@ class RoleRequestApi(
   fun apply(
     @Valid
     @RequestBody
-    roleRequest: RequestReq,
+    roleRequest: RoleReq,
   ) = ResponseEntity.ok(
     roleRequestServiceImpl.applyForRole(
       currentUserInfo,

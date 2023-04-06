@@ -14,7 +14,7 @@ class UserInfoServiceImpl(
    */
   fun getUserInfo(id: Long) = userInfoRepository
     .findById(id)
-    .orElseThrow { NoSuchElementException("User not found") }!!
+    .orElseThrow { NoSuchElementException("Error.User.not_found") }!!
 
   /**
    * 修改用户昵称

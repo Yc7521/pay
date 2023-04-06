@@ -11,6 +11,6 @@ class PayApplication
 
 fun main(args: Array<String>) {
   val context = runApplication<PayApplication>(*args)
-  val rb = context.getBean(ResourceBundle::class.java)
+  val rb = ResourceBundle.getBundle("i18n/messages", Locale.CHINESE)
   println(rb.getString("App.start"))
 }

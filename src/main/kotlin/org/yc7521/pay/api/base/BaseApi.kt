@@ -16,9 +16,9 @@ open class BaseApi {
     get() = userRepository
       .findById((SecurityContextHolder.getContext().authentication.principal as UserToken).id)
       .orElseThrow {
-        NoSuchElementException("\$Error.current.user_not_found")
+        NoSuchElementException("Error.CurrentUser.not_found")
       }
   val currentUserInfo: UserInfo
     get() = currentUser.userInfo
-      ?: throw NoSuchElementException("\$Error.current.info_not_found")
+      ?: throw NoSuchElementException("Error.CurrentInfo.not_found")
 }

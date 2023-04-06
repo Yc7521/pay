@@ -35,6 +35,6 @@ class UserToken(
   )
 
   init {
-    id = account.id ?: throw IllegalArgumentException("\$Error.UserToken.null_id")
+    id = account.id ?: throw IllegalArgumentException("Error.UserToken.null_id")
   }
 }

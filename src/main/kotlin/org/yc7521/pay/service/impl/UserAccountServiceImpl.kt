@@ -9,7 +9,6 @@ import org.yc7521.pay.repository.UserRepository
 import org.yc7521.pay.service.UserAccountService
 import org.yc7521.pay.util.PayException
 
-
 @Service
 class UserAccountServiceImpl(
   private val userRepository: UserRepository,
@@ -19,7 +18,9 @@ class UserAccountServiceImpl(
    * find by id
    */
   override fun findById(id: Long): UserAccount {
-    return userRepository.findById(id).orElseThrow { NoSuchElementException("User not found") }
+    return userRepository
+      .findById(id)
+      .orElseThrow { NoSuchElementException("Error.User.not_found") }
   }
 
   /**
@@ -31,7 +32,7 @@ class UserAccountServiceImpl(
     }?.let {
       return it
     }
-    throw IllegalStateException("用户名或密码错误")
+    throw IllegalStateException("Login.failed")
   }
 
   /**
@@ -39,7 +40,7 @@ class UserAccountServiceImpl(
    */
   override fun register(username: String, password: String): UserAccount {
     if (username.isBlank() || password.isBlank()) {
-      throw IllegalStateException("用户名或密码不能为空")
+      throw IllegalStateException("Login.blank")
     }
     if (userRepository.findAllByUsername(username).isEmpty()) {
       return userRepository.save(
@@ -55,18 +56,20 @@ class UserAccountServiceImpl(
         )
       )
     }
-    throw IllegalStateException("用户名已存在")
+    throw IllegalStateException("Login.exists")
   }
 
   /**
    * update
    */
-  override fun update(userAccount: UserAccount) = userRepository.save(userAccount)
+  override fun update(userAccount: UserAccount) =
+    userRepository.save(userAccount)
 
   /**
    * delete
    */
-  override fun delete(userAccount: UserAccount) = userRepository.delete(userAccount)
+  override fun delete(userAccount: UserAccount) =
+    userRepository.delete(userAccount)
 
   /**
    * delete
@@ -75,12 +78,16 @@ class UserAccountServiceImpl(
     userRepository.deleteById(id)
   }
 
-  override fun changePassword(it: UserAccount, oldPassword: String, newPassword: String) {
+  override fun changePassword(
+    it: UserAccount,
+    oldPassword: String,
+    newPassword: String,
+  ) {
     if (passwordEncoder.matches(oldPassword, it.password)) {
       it.password = passwordEncoder.encode(newPassword)
       userRepository.save(it)
     } else {
-      throw IllegalStateException("旧密码错误")
+      throw IllegalStateException("Error.ChangePassword.old_password")
     }
   }
 }

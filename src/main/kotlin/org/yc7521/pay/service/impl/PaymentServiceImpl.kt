@@ -33,22 +33,22 @@ class PaymentServiceImpl(
         TradingType.Receipt -> createPayment(
           currUserId, tradingCode.userInfoId!!, PayVM(
             money = tradingCode.money ?: money
-            ?: throw IllegalStateException("money is null")
+            ?: throw IllegalStateException("Error.PayInfo.unknown")
           )
         )
 
         TradingType.Payment -> createPayment(
           tradingCode.userInfoId!!, currUserId, PayVM(
             money = tradingCode.money ?: money
-            ?: throw IllegalStateException("money is null")
+            ?: throw IllegalStateException("Error.PayInfo.unknown")
           )
         )
 
-        null -> throw IllegalStateException("tradingType is null")
+        null -> throw IllegalStateException("Error.PayInfo.unknown")
       }
     }
 
-    else -> throw IllegalStateException("交易记录已存在")
+    else -> throw IllegalStateException("Error.PayInfo.duplicate_new")
   }.also {
     tradingCode.state = CodeState.Created
     tradingCode.payId = it.id
@@ -59,17 +59,17 @@ class PaymentServiceImpl(
    */
   fun createPayment(userId: Long, toUserId: Long, pay: PayVM) = userInfoRepository
     .findById(userId)
-    .orElseThrow { NoSuchElementException("User not found") }
+    .orElseThrow { NoSuchElementException("Error.User.not_found") }
     .let { from ->
       userInfoRepository
         .findById(toUserId)
-        .orElseThrow { NoSuchElementException("User not found") }
+        .orElseThrow { NoSuchElementException("Error.User.not_found") }
         .let { to ->
           if (from.money!! < pay.money!!) {
-            throw IllegalStateException("Not enough money")
+            throw IllegalStateException("Error.PayInfo.no_money")
           }
           if (from.id == to.id) {
-            throw IllegalStateException("Can't pay to yourself")
+            throw IllegalStateException("Error.PayInfo.pay_self")
           }
           payInfoRepository.save(
             pay.toPayInfo(
@@ -87,10 +87,10 @@ class PaymentServiceImpl(
     payId: Long,
   ) = payInfoRepository
     .findById(payId)
-    .orElseThrow { NoSuchElementException("PayInfo not found") }
+    .orElseThrow { NoSuchElementException("Error.PayInfo.not_found") }
     .let { pay ->
       if (pay.payingUser!!.id != currUserId) {
-        throw IllegalStateException("Not the payer")
+        throw IllegalStateException("Error.PayInfo.paying_user_not_eq")
       }
       pay!!
     }
@@ -108,14 +108,14 @@ class PaymentServiceImpl(
    */
   fun pay(payInfoId: Long): PayInfo = payInfoRepository
     .findById(payInfoId)
-    .orElseThrow { NoSuchElementException("PayInfo not found") }
+    .orElseThrow { NoSuchElementException("Error.PayInfo.not_found") }
     .let {
-      if (it.state != PayState.Unpaid) throw IllegalStateException("Can't pay again")
+      if (it.state != PayState.Unpaid) throw IllegalStateException("Error.PayInfo.duplicate_pay")
       it.payingUser!!.let { from ->
         it.receivingUser!!.let { to ->
-          if (to.id == from.id) throw IllegalStateException("Can't pay to yourself")
+          if (to.id == from.id) throw IllegalStateException("Error.PayInfo.pay_self")
           it.money!!.let { m ->
-            if (from.money!! < m) throw IllegalStateException("Not enough money")
+            if (from.money!! < m) throw IllegalStateException("Error.PayInfo.no_money")
 
             userInfoRepository.saveMoney(from.id!!, from.money!! - m)
             userInfoRepository.saveMoney(to.id!!, to.money!! + m)
@@ -124,7 +124,7 @@ class PaymentServiceImpl(
             payInfoRepository.updateState(it)
             payInfoRepository
               .findById(it.id!!)
-              .orElseThrow { NoSuchElementException("PayInfo not found") }
+              .orElseThrow { NoSuchElementException("Error.PayInfo.not_found") }
           }
         }
       }
@@ -143,13 +143,15 @@ class PaymentServiceImpl(
    */
   fun cancel(payInfoId: Long): PayInfo = payInfoRepository
     .findById(payInfoId)
-    .orElseThrow { NoSuchElementException("PayInfo not found") }
+    .orElseThrow { NoSuchElementException("Error.PayInfo.not_found") }
     .let {
-      if (it.state != PayState.Unpaid) throw IllegalStateException("Can't cancel")
+      if (it.state != PayState.Unpaid) throw IllegalStateException("Error.PayInfo.cannot_cancel")
       it.finish = LocalDateTime.now()
       it.state = PayState.Canceled
       payInfoRepository.updateState(it)
-      payInfoRepository.findById(it.id!!).orElseThrow { NoSuchElementException("PayInfo not found") }
+      payInfoRepository
+        .findById(it.id!!)
+        .orElseThrow { NoSuchElementException("Error.PayInfo.not_found") }
     }
 
   /**

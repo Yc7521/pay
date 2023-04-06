@@ -33,7 +33,7 @@ class UserDetailsServiceImpl : UserDetailsService {
       ?: // 如果没找到用户信息，抛出用户没找到异常
       throw UsernameNotFoundException(
         resourceBundle
-          .getString("Error.login.name_not_found")
+          .getString("Error.Login.name_not_found")
           .format(username)
       )
   }

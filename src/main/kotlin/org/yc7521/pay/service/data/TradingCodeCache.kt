@@ -44,7 +44,7 @@ class TradingCodeCache(
   }
 
   operator fun get(id: String): TradingCode =
-    cache[id.toLong()] ?: throw NoSuchElementException("\$Error.TradingCode.not_found")
+    cache[id.toLong()] ?: throw NoSuchElementException("Error.TradingCode.not_found")
 
   fun has(id: String): Boolean = cache.containsKey(id.toLong())
 
@@ -68,8 +68,8 @@ class TradingCodeCache(
       val code = get(id)
       if (code.state == CodeState.Finished || code.state == CodeState.Canceled) {
         cache.remove(id.toLong())
-      } else throw IllegalStateException("\$Error.TradingCode.not_finished")
-    } else throw NoSuchElementException("\$Error.TradingCode.not_found")
+      } else throw IllegalStateException("Error.TradingCode.not_finished")
+    } else throw NoSuchElementException("Error.TradingCode.not_found")
   }
 
   fun getId(): Long {

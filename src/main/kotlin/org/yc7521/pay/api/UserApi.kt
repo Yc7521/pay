@@ -3,13 +3,12 @@ package org.yc7521.pay.api
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.yc7521.pay.api.base.BaseApi
 import org.yc7521.pay.model.enums.UserType
 import org.yc7521.pay.model.genPaymentCode
 import org.yc7521.pay.model.genReceiptCode
-import org.yc7521.pay.model.vm.RequestReq
+import org.yc7521.pay.model.vm.RoleReq
 import org.yc7521.pay.repository.PayInfoRepository
 import org.yc7521.pay.service.UserAccountService
 import org.yc7521.pay.service.data.TradingCodeCache
@@ -59,11 +58,11 @@ class UserApi(
     @PathVariable
     role: UserType,
     @RequestBody
-    requestReq: RequestReq,
+    roleReq: RoleReq,
   ) = ResponseEntity.ok(
     roleRequestServiceImpl.applyForRole(
       currentUserInfo,
-      requestReq,
+      roleReq,
       role
     )
   )

@@ -13,6 +13,7 @@ import org.yc7521.pay.model.vm.LoginRes
 import org.yc7521.pay.model.vm.LoginVM
 import org.yc7521.pay.service.UserAccountService
 import javax.annotation.security.PermitAll
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("/api")
@@ -69,6 +70,7 @@ class SystemApi(
   @Operation(summary = "Register.")
   fun register(
     @RequestBody
+    @Valid
     user: LoginVM,
   ) = ResponseEntity.ok(userAccountService.register(user.username!!, user.password!!))
 

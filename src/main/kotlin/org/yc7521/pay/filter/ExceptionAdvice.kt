@@ -21,10 +21,11 @@ class ExceptionAdvice(
 ) {
   private final fun getMessage(e: Exception): String =
     e.message?.let {
-      if (it.startsWith("\$"))
-        resourceBundle.getString(it.substring(1))
-      else
+      try {
+        resourceBundle.getString(it)
+      } catch (e: Exception) {
         it
+      }
     } ?: ""
 
   private final fun getErrorVM(e: Exception): ErrorVM =

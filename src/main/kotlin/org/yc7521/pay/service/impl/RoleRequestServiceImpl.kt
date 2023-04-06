@@ -7,7 +7,7 @@ import org.yc7521.pay.model.UserInfo
 import org.yc7521.pay.model.enums.RoleRequestState
 import org.yc7521.pay.model.enums.RoleRequestState.*
 import org.yc7521.pay.model.enums.UserType
-import org.yc7521.pay.model.vm.RequestReq
+import org.yc7521.pay.model.vm.RoleReq
 import org.yc7521.pay.repository.RoleRequestRepository
 import org.yc7521.pay.repository.UserInfoRepository
 import java.time.LocalDateTime
@@ -28,7 +28,7 @@ class RoleRequestServiceImpl(
    */
   fun get(id: Long) = roleRequestRepository
     .findById(id)
-    .orElseThrow { NoSuchElementException() }!!
+    .orElseThrow { NoSuchElementException("Error.RoleReq.not_found") }!!
 
   /**
    * 列出所有申请
@@ -49,14 +49,14 @@ class RoleRequestServiceImpl(
    */
   fun applyForRole(
     currentUser: UserInfo,
-    requestReq: RequestReq,
+    roleReq: RoleReq,
     role: UserType = UserType.Business,
   ) = applyForRole(
     currentUser,
-    requestReq.name,
-    requestReq.idCard,
+    roleReq.name,
+    roleReq.idCard,
     role,
-    requestReq.remarks ?: ""
+    roleReq.remarks ?: ""
   )
 
   /**
@@ -72,13 +72,13 @@ class RoleRequestServiceImpl(
     val roleRequest = roleRequestRepository.findAllByApplicantId(currentUser.id!!)
     return when {
       currentUser.credible == false ->
-        throw IllegalStateException("You are not credible")
+        throw IllegalStateException("Error.User.not_credible")
 
       currentUser.userType!!.ordinal >= role.ordinal ->
-        throw IllegalStateException("You have already been ${currentUser.userType}")
+        throw IllegalStateException("Error.RoleReq.duplicate_role")
 
       roleRequest.any { it.state == Unprocessed } ->
-        throw IllegalStateException("Your application has been submitted")
+        throw IllegalStateException("Error.RoleReq.unprocessed")
 
       roleRequest.isEmpty() ->
         roleRequestRepository.save(
@@ -97,7 +97,7 @@ class RoleRequestServiceImpl(
       else -> roleRequest.first().let {
         when (it.state) {
           Reject ->
-            throw IllegalStateException("You have been rejected. Please contact the administrator")
+            throw IllegalStateException("Error.RoleReq.rejected")
 
           CanReapply -> {
             it.create = LocalDateTime.now()
@@ -110,7 +110,7 @@ class RoleRequestServiceImpl(
             roleRequestRepository.save(it)
           }
 
-          else -> throw IllegalStateException("You have already been ${it.to}")
+          else -> throw IllegalStateException("Error.RoleReq.unknown")
         }
       }
     }
@@ -122,7 +122,7 @@ class RoleRequestServiceImpl(
   fun admit(id: Long, approver: UserInfo) =
     roleRequestRepository
       .findById(id)
-      .orElseThrow { NoSuchElementException("申请不存在") }!!
+      .orElseThrow { NoSuchElementException("Error.RoleReq.not_found") }!!
       .also { roleRequest ->
         roleRequest.applicant?.let {
           it.userType = roleRequest.to
@@ -131,7 +131,7 @@ class RoleRequestServiceImpl(
           roleRequest.state = Permit
           roleRequest.approver = approver
           roleRequestRepository.save(roleRequest)
-        } ?: throw NoSuchElementException("申请用户不存在")
+        } ?: throw NoSuchElementException("Error.User.not_found")
       }
 
   /**
@@ -140,12 +140,11 @@ class RoleRequestServiceImpl(
   fun reject(id: Long, approver: UserInfo) =
     roleRequestRepository
       .findById(id)
-      .orElseThrow { NoSuchElementException("申请不存在") }!!
+      .orElseThrow { NoSuchElementException("Error.RoleReq.not_found") }!!
       .also { roleRequest ->
         roleRequest.finish = LocalDateTime.now()
         roleRequest.state = Reject
         roleRequest.approver = approver
         roleRequestRepository.save(roleRequest)
       }
-
 }

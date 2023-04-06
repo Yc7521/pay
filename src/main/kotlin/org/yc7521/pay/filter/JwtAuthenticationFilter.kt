@@ -34,13 +34,13 @@ class JwtAuthenticationFilter(
   init {
     // 设置登录失败处理类
     setAuthenticationFailureHandler { _: HttpServletRequest?, rep: HttpServletResponse, e: AuthenticationException ->
-      logger.info("login failed")
+      logger.info("Login failed")
       if (e is UsernameNotFoundException) {
         ResponseUtil.write(
           ok(
             LoginRes(
               true,
-              resourceBundle.getString("login.name_not_found")
+              resourceBundle.getString("Login.name_not_found")
             )
           ), rep
         )
@@ -49,7 +49,7 @@ class JwtAuthenticationFilter(
           ok(
             LoginRes(
               true,
-              resourceBundle.getString("login.failed")
+              resourceBundle.getString("Login.failed")
             )
           ), rep
         )
@@ -64,7 +64,7 @@ class JwtAuthenticationFilter(
         ok(
           LoginRes(
             false,
-            resourceBundle.getString("login.success").format(auth.name),
+            resourceBundle.getString("Login.success").format(auth.name),
             userToken.token
           )
         ),
