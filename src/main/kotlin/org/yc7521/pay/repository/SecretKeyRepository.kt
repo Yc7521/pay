@@ -4,4 +4,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.yc7521.pay.model.SecretKey
 
 interface SecretKeyRepository : JpaRepository<SecretKey, String> {
+  fun findByUserInfoId(id: Long): List<SecretKey>
 }

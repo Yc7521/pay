@@ -82,7 +82,7 @@ class RegisterTests {
         jsonPath("$.msg") {
           isString()
         }
-        jsonPath("$.id_token") {
+        jsonPath("$.idToken") {
           isString()
         }
       }

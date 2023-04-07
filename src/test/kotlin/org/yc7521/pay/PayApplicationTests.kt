@@ -47,7 +47,7 @@ class PayApplicationTests {
         jsonPath("$.msg") {
           isString()
         }
-        jsonPath("$.id_token") {
+        jsonPath("$.idToken") {
           isString()
         }
       }
@@ -56,7 +56,7 @@ class PayApplicationTests {
         res.response.contentAsString.let {
           logger.info(it)
           objectMapper.readTree(it).let { root ->
-            token = root["id_token"].asText()
+            token = root["idToken"].asText()
           }
         }
       }

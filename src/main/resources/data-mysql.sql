@@ -1,9 +1,9 @@
 
 
 INSERT INTO pay.user_info (id, credible, deleted, money, nickname, user_type)
-VALUES (1, true, false, 100.0000, 'admin', 'Admin'),
-       (2, true, false, 100.0000, '1', 'Business'),
-       (3, true, false, 100.0000, '2', 'Personal');
+VALUES (1, true, false, 1000.0000, 'admin', 'Admin'),
+       (2, true, false, 1000.0000, '1', 'Business'),
+       (3, true, false, 1000.0000, '2', 'Personal');
 
 INSERT INTO pay.user (id, password, username, user_info_id)
 VALUES (1, '$2a$10$nYqBafr3DkZo83/iIh61HO9c76a.oCK3/dTfR0Z.b5FmYkGPw5Rxa', 'admin', 1),
