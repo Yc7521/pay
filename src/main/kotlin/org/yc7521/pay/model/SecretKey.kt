@@ -9,11 +9,16 @@ import java.util.*
 import javax.persistence.*
 
 @Entity
-@Table(name = "secret_key")
+@Table(name = "secret_key", indexes = [
+  Index(name = "idx_expired_time", columnList = "expired_time")
+])
 open class SecretKey(
   @Id
   @Column(name = "secret_key", nullable = false)
   open var key: String? = null,
+
+  @Column(name = "username", nullable = false, unique = true, length = 31)
+  open var username: String? = null,
 
   @Column(name = "expired_time")
   @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "GMT+8")

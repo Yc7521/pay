@@ -168,7 +168,7 @@ class WebSecurityConfig {
         if (!isValid) {
           throw BadCredentialsException("密码错误！")
         }
-        val token = tokenService!!.getToken(userInfo)
+        val token = tokenService.getToken(userInfo)
         userInfo.token = token
         return UsernamePasswordAuthenticationToken(
           userInfo,

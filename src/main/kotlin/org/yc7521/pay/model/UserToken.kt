@@ -4,10 +4,22 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 
-class UserToken(
-  account: UserAccount,
-  authorities: Collection<GrantedAuthority>,
-) : User(account.username, account.password, authorities) {
+class UserToken : User {
+  constructor(account: UserAccount, authorities: Collection<GrantedAuthority>) : super(
+    account.username, account.password, authorities
+  ) {
+    id = account.id ?: throw IllegalArgumentException("Error.UserToken.null_id")
+  }
+
+  constructor(
+    secretKey: SecretKey,
+    authorities: Collection<GrantedAuthority>,
+  ) : super(
+    secretKey.username, secretKey.key, authorities
+  ) {
+    id = -1
+  }
+
   var id: Long
 
   var token: String? = null
@@ -19,8 +31,17 @@ class UserToken(
    * @param role    角色
    */
   constructor(account: UserAccount, role: GrantedAuthority) : this(
-    account,
-    listOf(role)
+    account, listOf(role)
+  )
+
+  /**
+   * 创建一个对应账户和角色的UserToken.
+   *
+   * @param account 账户
+   * @param role    角色
+   */
+  constructor(account: SecretKey, role: GrantedAuthority) : this(
+    account, listOf(role)
   )
 
   /**
@@ -34,7 +55,15 @@ class UserToken(
       ?: SimpleGrantedAuthority("anonymous")
   )
 
-  init {
-    id = account.id ?: throw IllegalArgumentException("Error.UserToken.null_id")
-  }
+  /**
+   * 创建一个对应账户的UserToken.
+   *
+   * @param account 账户
+   */
+  constructor(account: SecretKey) : this(
+    account,
+    account.userInfo?.userType?.getSimpleGrantedAuthority()
+      ?: SimpleGrantedAuthority("anonymous")
+  )
+
 }

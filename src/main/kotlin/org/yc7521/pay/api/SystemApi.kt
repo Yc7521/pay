@@ -11,9 +11,12 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.yc7521.pay.model.vm.LoginRes
 import org.yc7521.pay.model.vm.LoginVM
+import org.yc7521.pay.model.vm.SecretLoginVM
 import org.yc7521.pay.service.UserAccountService
+import org.yc7521.pay.util.log.annotation.Log
 import javax.annotation.security.PermitAll
 import javax.validation.Valid
+import io.swagger.v3.oas.annotations.parameters.RequestBody as OpRequestBody
 
 @RestController
 @RequestMapping("/api")
@@ -29,6 +32,11 @@ class SystemApi(
   @PermitAll
   @Operation(
     summary = "Login.",
+    requestBody = OpRequestBody(
+      content = [
+        Content(schema = Schema(anyOf = [LoginVM::class, SecretLoginVM::class])),
+      ]
+    ),
     responses = [
       ApiResponse(
         content = [
@@ -36,10 +44,7 @@ class SystemApi(
         ]
       )]
   )
-  fun login(
-    @RequestBody
-    user: LoginVM,
-  ) {
+  fun login() {
   }
 
   /**
