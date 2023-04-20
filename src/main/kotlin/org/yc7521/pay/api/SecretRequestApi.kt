@@ -16,7 +16,7 @@ import java.util.UUID
 
 @RestController
 @RequestMapping("/api/request/secret")
-@Tag(name = "/Api/Role Request")
+@Tag(name = "/Api/ApiKey Request")
 class SecretRequestApi(
   private val secretKeyRepository: SecretKeyRepository,
 ) : BaseApi() {
