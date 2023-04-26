@@ -12,6 +12,7 @@ import org.yc7521.pay.model.UserInfo
 import org.yc7521.pay.model.vm.SecretReqVM
 import org.yc7521.pay.model.vm.toSecretKey
 import org.yc7521.pay.repository.SecretKeyRepository
+import java.time.LocalDateTime.now
 import java.util.UUID
 
 @RestController
@@ -52,7 +53,7 @@ class SecretRequestApi(
   }
 
   @GetMapping("/user/{id}")
-  @Operation(summary = "Get a SecretKey by user id.")
+  @Operation(summary = "List SecretKeys by user id.")
   @PreAuthorize("hasRole('admin')")
   fun getByUserId(
     @PathVariable
@@ -67,6 +68,17 @@ class SecretRequestApi(
     key: String,
   ) = ResponseEntity.ok(secretKeyRepository.deleteById(key))
 
+  @GetMapping("/user/me")
+  @Operation(summary = "List SecretKeys for current user.")
+  @PreAuthorize("hasRole('business')")
+  fun listForMe() =
+    ResponseEntity.ok(
+      secretKeyRepository.findByUserInfoId(
+        currentUserInfo.id
+          ?: throw IllegalArgumentException("Error.CurrentUser.not_found")
+      )
+    )
+
   @PostMapping("/user/me")
   @Operation(summary = "Create a SecretKey for current user.")
   @PreAuthorize("hasRole('business')")
@@ -74,7 +86,11 @@ class SecretRequestApi(
     @RequestBody
     secretReqVM: SecretReqVM,
   ) = secretReqVM.toSecretKey().let {
+    if (it.expired?.isBefore(now()) != false) {
+      throw IllegalArgumentException("Error.ApiKey.expired")
+    }
     it.key = secretKey()
+    it.username = currentUser.username
     it.userInfo = currentUserInfo
     ResponseEntity.ok(secretKeyRepository.save(it))
   }
@@ -87,18 +103,12 @@ class SecretRequestApi(
   private fun generateSecretKey(): String =
     // generate a random string, with UUID
     StringBuilder(
-      UUID
-        .randomUUID()
-        .toString()
-        .replace("-", "")
-        .reversed()
-    ).let {
-      // insert the random character into the string
+      UUID.randomUUID().toString().replace("-", "").reversed()
+    ).let { // insert the random character into the string
       it.insert(8, ('0'..'9').random())
       it.insert(13, ('0'..'9').random())
       it.insert(18, ('0'..'9').random())
-      it.insert(23, ('0'..'9').random())
-      // return the string
+      it.insert(23, ('0'..'9').random()) // return the string
       it.toString()
     }
 

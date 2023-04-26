@@ -44,7 +44,7 @@ class ExceptionAdvice(
   @ExceptionHandler(
     MethodArgumentNotValidException::class
   )
-  fun handler(e: MethodArgumentNotValidException): ResponseEntity<*> {
+  fun handler(e: MethodArgumentNotValidException): ResponseEntity<ErrorVM> {
     val message = e.bindingResult
       .allErrors
       .stream().map { it.defaultMessage }
@@ -57,7 +57,7 @@ class ExceptionAdvice(
   }
 
   @ExceptionHandler(value = [NullPointerException::class])
-  fun process(e: NullPointerException): ResponseEntity<*> =
+  fun process(e: NullPointerException): ResponseEntity<ErrorVM> =
     ResponseEntity
       .internalServerError()
       .body(getErrorVM(e))
@@ -70,7 +70,7 @@ class ExceptionAdvice(
       IllegalArgumentException::class,
     ]
   )
-  fun process(e: PayException): ResponseEntity<*> =
+  fun process(e: Exception): ResponseEntity<ErrorVM> =
     ResponseEntity
       .badRequest()
       .body(getErrorVM(e))

@@ -98,9 +98,8 @@ class RegisterTests {
   companion object {
     @JvmStatic
     fun registerProvider(): List<LoginVM> = listOf(
-      LoginVM("admin", "admin"),
-      LoginVM("1", "1"),
-      LoginVM("2", "2"),
+      LoginVM("test1", "123"),
+      LoginVM("test2", "123"),
     )
   }
 }
