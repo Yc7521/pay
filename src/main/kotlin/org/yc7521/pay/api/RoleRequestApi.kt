@@ -19,7 +19,10 @@ class RoleRequestApi(
   private val roleRequestServiceImpl: RoleRequestServiceImpl,
 ) : BaseApi() {
   @GetMapping
-  @Operation(summary = "List all RoleRequest.")
+  @Operation(
+    operationId = "listRoleRequest",
+    summary = "List all RoleRequest.",
+  )
   @PreAuthorize("hasRole('admin')")
   fun list(
     @RequestParam("page", defaultValue = "0")
@@ -29,7 +32,10 @@ class RoleRequestApi(
   ) = ResponseEntity.ok(roleRequestServiceImpl.list(PageRequest.of(page, size)))
 
   @GetMapping("/{id}")
-  @Operation(summary = "Get a RoleRequest by id.")
+  @Operation(
+    operationId = "getRoleRequest",
+    summary = "Get a RoleRequest by id.",
+  )
   fun get(
     @PathVariable
     id: Long,
@@ -44,7 +50,10 @@ class RoleRequestApi(
    *  - apply
    */
   @GetMapping("/state/{state}")
-  @Operation(summary = "List RoleRequest by state.")
+  @Operation(
+    operationId = "listRoleRequestByState",
+    summary = "List RoleRequest by state.",
+  )
   @PreAuthorize("hasRole('admin')")
   fun listByState(
     @PathVariable
@@ -61,7 +70,10 @@ class RoleRequestApi(
   )
 
   @GetMapping("/applicant/{applicantId}")
-  @Operation(summary = "List RoleRequest by applicantId.")
+  @Operation(
+    operationId = "listRoleRequestByApplicantId",
+    summary = "List RoleRequest by applicantId.",
+  )
   @PreAuthorize("hasRole('admin')")
   fun listByApplicantId(
     @PathVariable
@@ -78,7 +90,10 @@ class RoleRequestApi(
   )
 
   @PostMapping("/{id}/approve")
-  @Operation(summary = "Approve a RoleRequest by id.")
+  @Operation(
+    operationId = "approveRoleRequest",
+    summary = "Approve a RoleRequest by id.",
+  )
   @PreAuthorize("hasRole('admin')")
   fun approve(
     @PathVariable
@@ -86,7 +101,10 @@ class RoleRequestApi(
   ) = ResponseEntity.ok(roleRequestServiceImpl.admit(id, currentUserInfo))
 
   @PostMapping("/{id}/reject")
-  @Operation(summary = "Reject a RoleRequest by id.")
+  @Operation(
+    operationId = "rejectRoleRequest",
+    summary = "Reject a RoleRequest by id.",
+  )
   @PreAuthorize("hasRole('admin')")
   fun reject(
     @PathVariable
@@ -94,7 +112,10 @@ class RoleRequestApi(
   ) = ResponseEntity.ok(roleRequestServiceImpl.reject(id, currentUserInfo))
 
   @PostMapping
-  @Operation(summary = "Apply for a role.")
+  @Operation(
+    operationId = "applyRoleRequest",
+    summary = "Apply for a role.",
+  )
   fun apply(
     @Valid
     @RequestBody

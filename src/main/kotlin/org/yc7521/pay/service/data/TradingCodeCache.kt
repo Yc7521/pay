@@ -23,14 +23,14 @@ class TradingCodeCache(
 ) {
   private val cache: ConcurrentHashMap<Long, TradingCode> = ConcurrentHashMap()
 
-  fun list(page: PageRequest): Page<TradingCode> = cache.values.toList().let { list ->
-    PageImpl(
-      list.sortedBy { it.create }.subList(
-        page.pageNumber * page.pageSize, (page.pageNumber + 1) * page.pageSize
-      ), page, list.size.toLong()
-    )
-  }
-
+  fun list(page: PageRequest): Page<TradingCode> =
+    cache.values.toList().let { list ->
+      PageImpl(
+        list.sortedBy { it.create }.subList(
+          page.pageNumber * page.pageSize, (page.pageNumber + 1) * page.pageSize
+        ), page, list.size.toLong()
+      )
+    }
 
   operator fun set(id: String, code: TradingCode) {
     code.id = id
@@ -44,18 +44,19 @@ class TradingCodeCache(
   }
 
   operator fun get(id: String): TradingCode =
-    cache[id.toLong()] ?: throw NoSuchElementException("Error.TradingCode.not_found")
+    cache[id.toLong()]
+      ?: throw NoSuchElementException("Error.TradingCode.not_found")
 
   fun has(id: String): Boolean = cache.containsKey(id.toLong())
 
-  fun getByUserId(userId: Long): TradingCode? =
-    cache.values.find { it.userInfoId == userId }
+  fun getByUserId(userId: Long): List<TradingCode> =
+    cache.values.filter { it.userInfoId == userId }
 
   fun put(code: TradingCode, unique: Boolean = true) =
     (code.id?.toLong() ?: getId()).let { id ->
       if (unique) {
         // remove old code if exists
-        getByUserId(code.userInfoId!!)?.let {
+        getByUserId(code.userInfoId!!).forEach {
           cache.remove(it.id?.toLong())
         }
       }
@@ -89,5 +90,4 @@ class TradingCodeCache(
   fun findAllNotNotifiedByUserInfoId(userInfoId: Long?): List<TradingCode> {
     return findAllByUserInfoId(userInfoId).filter { it.state == CodeState.NotNotified }
   }
-
 }

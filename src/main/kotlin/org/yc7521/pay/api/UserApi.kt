@@ -33,14 +33,20 @@ class UserApi(
    * GET: get current user
    */
   @GetMapping("/me")
-  @Operation(summary = "Get user info by current user.")
+  @Operation(
+    operationId = "me",
+    summary = "Get user info by current user.",
+  )
   fun me() = ResponseEntity.ok(currentUserInfo)
 
   /**
    * PUT: update the nickname of current user
    */
   @PutMapping("/me")
-  @Operation(summary = "Update the nickname of current user.")
+  @Operation(
+    operationId = "changeNickname",
+    summary = "Update the nickname of current user.",
+  )
   fun updateNickname(nickname: String) =
     ResponseEntity.ok(
       userInfoServiceImpl.changeNickname(
@@ -53,7 +59,10 @@ class UserApi(
    * POST: apply for role
    */
   @PostMapping("/me/to/{role}")
-  @Operation(summary = "Apply for role.")
+  @Operation(
+    operationId = "applyForRole",
+    summary = "Apply for role.",
+  )
   fun applyForRole(
     @PathVariable
     role: UserType,
@@ -71,14 +80,20 @@ class UserApi(
    * DELETE: delete current user
    */
   @DeleteMapping("/me")
-  @Operation(summary = "Delete current user.")
+  @Operation(
+    operationId = "deleteMe",
+    summary = "Delete current user.",
+  )
   fun deleteMe() = userAccountService.delete(currentUser)
 
   /**
    * PUT: change password
    */
   @PutMapping("/me/password")
-  @Operation(summary = "Change the password of current user.")
+  @Operation(
+    operationId = "changePassword",
+    summary = "Change the password of current user.",
+  )
   fun changePassword(
     @RequestParam
     oldPassword: String,
@@ -90,7 +105,10 @@ class UserApi(
    * GET: get user by id
    */
   @GetMapping("/{id}")
-  @Operation(summary = "Get user info by user id.")
+  @Operation(
+    operationId = "getUserInfo",
+    summary = "Get user info by user id.",
+  )
   fun get(
     @PathVariable
     id: Long,
@@ -100,7 +118,10 @@ class UserApi(
    * GET: gen payment code
    */
   @GetMapping("/me/payment-code")
-  @Operation(summary = "Gen payment code.")
+  @Operation(
+    operationId = "genPaymentCode",
+    summary = "Gen payment code.",
+  )
   fun genPaymentCode() = ResponseEntity.ok(
     tradingCodeCache.put(currentUserInfo.genPaymentCode()).toVM()
   )
@@ -109,7 +130,10 @@ class UserApi(
    * GET: gen receipt code
    */
   @GetMapping("/me/receipt-code")
-  @Operation(summary = "Gen receipt code.")
+  @Operation(
+    operationId = "genReceiptCode",
+    summary = "Gen receipt code.",
+  )
   fun genReceiptCode(money: BigDecimal? = null) = ResponseEntity.ok(
     // TODO: need to check if current UserType is Business
     currentUserInfo.let {

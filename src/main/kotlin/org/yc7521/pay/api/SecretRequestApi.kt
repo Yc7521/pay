@@ -22,7 +22,10 @@ class SecretRequestApi(
   private val secretKeyRepository: SecretKeyRepository,
 ) : BaseApi() {
   @GetMapping
-  @Operation(summary = "List all SecretKey.")
+  @Operation(
+    operationId = "listApiKey",
+    summary = "List all SecretKey.",
+  )
   @PreAuthorize("hasRole('admin')")
   fun list(
     @RequestParam("page", defaultValue = "0")
@@ -32,7 +35,10 @@ class SecretRequestApi(
   ) = ResponseEntity.ok(secretKeyRepository.findAll(PageRequest.of(page, size)))
 
   @GetMapping("/{key}")
-  @Operation(summary = "Get a SecretKey by id.")
+  @Operation(
+    operationId = "getApiKey",
+    summary = "Get a SecretKey by id.",
+  )
   @PreAuthorize("hasRole('admin')")
   fun get(
     @PathVariable
@@ -40,7 +46,10 @@ class SecretRequestApi(
   ) = ResponseEntity.ok(secretKeyRepository.findById(key))
 
   @PostMapping("/user/{id}")
-  @Operation(summary = "Create a SecretKey.")
+  @Operation(
+    operationId = "createApiKey",
+    summary = "Create a SecretKey.",
+  )
   @PreAuthorize("hasRole('admin')")
   fun create(
     @PathVariable
@@ -53,7 +62,10 @@ class SecretRequestApi(
   }
 
   @GetMapping("/user/{id}")
-  @Operation(summary = "List SecretKeys by user id.")
+  @Operation(
+    operationId = "getApiKeyByUserId",
+    summary = "List SecretKeys by user id.",
+  )
   @PreAuthorize("hasRole('admin')")
   fun getByUserId(
     @PathVariable
@@ -61,7 +73,10 @@ class SecretRequestApi(
   ) = ResponseEntity.ok(secretKeyRepository.findByUserInfoId(id))
 
   @DeleteMapping("/{key}")
-  @Operation(summary = "Delete a SecretKey by key.")
+  @Operation(
+    operationId = "deleteApiKey",
+    summary = "Delete a SecretKey by key.",
+  )
   @PreAuthorize("hasRole('admin')")
   fun delete(
     @PathVariable
@@ -69,7 +84,10 @@ class SecretRequestApi(
   ) = ResponseEntity.ok(secretKeyRepository.deleteById(key))
 
   @GetMapping("/user/me")
-  @Operation(summary = "List SecretKeys for current user.")
+  @Operation(
+    operationId = "listApiKeyForMe",
+    summary = "List SecretKeys for current user.",
+  )
   @PreAuthorize("hasRole('business')")
   fun listForMe() =
     ResponseEntity.ok(
@@ -80,7 +98,10 @@ class SecretRequestApi(
     )
 
   @PostMapping("/user/me")
-  @Operation(summary = "Create a SecretKey for current user.")
+  @Operation(
+    operationId = "createApiKeyForMe",
+    summary = "Create a SecretKey for current user.",
+  )
   @PreAuthorize("hasRole('business')")
   fun createForMe(
     @RequestBody
@@ -96,7 +117,11 @@ class SecretRequestApi(
   }
 
   @GetMapping("/test")
-  @Operation(summary = "Test for admin.")
+  @Operation(
+    operationId = "generateSecretKeyTest",
+    summary = "Test for admin.",
+    deprecated = true,
+  )
   @PreAuthorize("hasRole('admin')")
   fun generateSecretKeyTest() = ResponseEntity.ok(secretKey())
 

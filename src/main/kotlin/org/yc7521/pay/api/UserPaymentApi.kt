@@ -32,7 +32,10 @@ class UserPaymentApi(
    * @param size 每页数量
    */
   @GetMapping
-  @Operation(summary = "List all PayInfo.")
+  @Operation(
+    operationId = "listPayInfo",
+    summary = "List all PayInfo.",
+  )
   fun list(
     @RequestParam(required = false, defaultValue = "0")
     page: Int = 0,
@@ -50,12 +53,20 @@ class UserPaymentApi(
    * 创建订单
    */
   @PostMapping("user")
-  @Operation(summary = "Create PayInfo by userId.", description = "Pay to user")
+  @Operation(
+    operationId = "createPayToUser",
+    summary = "Create PayInfo by userId.",
+    description = "Pay to user",
+  )
   fun createPayment(
     @RequestBody
     payVM: PayVM,
   ) = ResponseEntity.ok(
-    paymentService.createPayment(currentUserInfo.id!!, payVM.userId!!.toLong(), payVM)
+    paymentService.createPayment(
+      currentUserInfo.id!!,
+      payVM.userId!!.toLong(),
+      payVM
+    )
   )
 
   /**
@@ -63,13 +74,22 @@ class UserPaymentApi(
    * 创建订单
    */
   @PostMapping("code/{codeId}")
+  @Operation(
+    operationId = "createPayWithCode",
+    summary = "Create PayInfo with trading code.",
+    description = "Pay to user",
+  )
   fun createPaymentWithCode(
     @PathVariable
     codeId: String,
     @RequestParam(required = false)
     money: BigDecimal? = null,
   ) = ResponseEntity.ok(
-    paymentService.createPayment(currentUserInfo.id!!, tradingCodeCache[codeId], money)
+    paymentService.createPayment(
+      currentUserInfo.id!!,
+      tradingCodeCache[codeId],
+      money
+    )
   )
 
   /**
@@ -77,9 +97,14 @@ class UserPaymentApi(
    * 支付
    */
   @PutMapping("code/{codeId}")
+  @Operation(
+    operationId = "confirmPayCode",
+    summary = "Pay.",
+    description = "Update PayInfo and UserInfo to finish this payment by trading code"
+  )
   fun payWithCode(
     @PathVariable
-    codeId: String
+    codeId: String,
   ) = ResponseEntity.ok(
     paymentService.pay(tradingCodeCache[codeId])
   )
@@ -89,9 +114,14 @@ class UserPaymentApi(
    * 支付
    */
   @PutMapping("code/{codeId}/cancel")
+  @Operation(
+    operationId = "cancelPayCode",
+    summary = "Cancel.",
+    description = "Update PayInfo to cancel this payment by trading code",
+  )
   fun cancelWithCode(
     @PathVariable
-    codeId: String
+    codeId: String,
   ) = ResponseEntity.ok(
     paymentService.cancel(tradingCodeCache[codeId])
   )
@@ -101,7 +131,11 @@ class UserPaymentApi(
    * 支付
    */
   @PutMapping("{id}")
-  @Operation(summary = "Pay.", description = "Update PayInfo and UserInfo to finish this payment")
+  @Operation(
+    operationId = "confirmPay",
+    summary = "Pay.",
+    description = "Update PayInfo and UserInfo to finish this payment"
+  )
   fun pay(
     @PathVariable
     id: Long,
@@ -114,7 +148,11 @@ class UserPaymentApi(
    * PUT: cancel pay
    */
   @PutMapping("{id}/cancel")
-  @Operation(summary = "Cancel.", description = "Update PayInfo to cancel this payment")
+  @Operation(
+    operationId = "cancelPay",
+    summary = "Cancel.",
+    description = "Update PayInfo to cancel this payment",
+  )
   fun cancel(
     @PathVariable
     id: Long,

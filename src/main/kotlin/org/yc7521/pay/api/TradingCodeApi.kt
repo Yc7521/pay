@@ -20,7 +20,10 @@ class TradingCodeApi(
   private val tradingCodeCache: TradingCodeCache,
 ) : BaseApi() {
   @GetMapping
-  @Operation(summary = "List all TradingCode.")
+  @Operation(
+    operationId = "listTradingCode",
+    summary = "List all TradingCode.",
+  )
   @PreAuthorize("hasRole('admin')")
   fun list(
     @RequestParam("page", defaultValue = "0")
@@ -30,38 +33,56 @@ class TradingCodeApi(
   ) = ok(tradingCodeCache.list(PageRequest.of(page, size)).map { it.toVM() })
 
   @GetMapping("/{id}")
-  @Operation(summary = "Get a TradingCode by id.")
+  @Operation(
+    operationId = "getTradingCode",
+    summary = "Get a TradingCode by id.",
+  )
   fun get(
     @PathVariable
     id: String,
   ) = ok(tradingCodeCache[id])
 
   @GetMapping("/has/{id}")
-  @Operation(summary = "Exist a TradingCode by id.")
+  @Operation(
+    operationId = "hasTradingCode",
+    summary = "Exist a TradingCode with id.",
+  )
   fun has(
     @PathVariable
     id: String,
   ): ResponseEntity<Any> =
-    if (tradingCodeCache.has(id)) ok().build() else ResponseEntity.notFound().build()
+    if (tradingCodeCache.has(id)) ok().build() else ResponseEntity
+      .notFound()
+      .build()
 
   @GetMapping("/user/{userId}")
-  @Operation(summary = "List TradingCode by userId.")
+  @Operation(
+    operationId = "listRoleRequestByUserId",
+    summary = "List TradingCode by userId.",
+  )
   fun getByUserId(
     @PathVariable
     userId: Long,
-  ) = tradingCodeCache.getByUserId(userId)?.let { ok(it.toVM()) } ?: ResponseEntity
-    .notFound()
-    .build()
+  ) = tradingCodeCache
+    .getByUserId(userId)
+    .map { it.toVM() }
+    .let { ok(it) }
 
   @PostMapping
-  @Operation(summary = "Submit a TradingCode.")
+  @Operation(
+    operationId = "updateTradingCode",
+    summary = "Submit a TradingCode.",
+  )
   fun put(
     @RequestBody
     tradingCode: TradingCode,
   ) = ok(tradingCodeCache.put(tradingCode).toVM())
 
   @DeleteMapping("/{id}")
-  @Operation(summary = "Remove a TradingCode by id if it's Finished.")
+  @Operation(
+    operationId = "removeTradingCode",
+    summary = "Remove a TradingCode by id if it's Finished.",
+  )
   fun checkAndRemove(
     @PathVariable
     id: String,
@@ -71,7 +92,11 @@ class TradingCodeApi(
    * only for test
    */
   @GetMapping("/getId")
-  @Operation(summary = "Gen id, only test for admin users.")
+  @Operation(
+    operationId = "GenTradingCodeIdTest",
+    summary = "Gen id, only test for admin users.",
+    deprecated = true,
+  )
   @PreAuthorize("hasRole('admin')")
-  fun getId() = ok(tradingCodeCache.getId())
+  fun getId() = ok(tradingCodeCache.getId().toString())
 }

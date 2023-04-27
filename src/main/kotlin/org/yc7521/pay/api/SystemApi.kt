@@ -31,6 +31,7 @@ class SystemApi(
   @SecurityRequirements
   @PermitAll
   @Operation(
+    operationId = "login",
     summary = "Login.",
     requestBody = OpRequestBody(
       content = [
@@ -42,7 +43,8 @@ class SystemApi(
         content = [
           Content(schema = Schema(implementation = LoginRes::class)),
         ]
-      )]
+      ),
+    ],
   )
   fun login() {
   }
@@ -54,17 +56,18 @@ class SystemApi(
   @SecurityRequirements
   @PermitAll
   @Operation(
+    operationId = "logout",
     summary = "Logout.",
     responses = [
       ApiResponse(
         content = [
           Content(schema = Schema(implementation = String::class)),
         ]
-      )]
+      ),
+    ],
   )
   fun logout() {
   }
-
 
   /**
    * POST: register
@@ -72,22 +75,32 @@ class SystemApi(
   @PostMapping("/register")
   @SecurityRequirements
   @PermitAll
-  @Operation(summary = "Register.")
+  @Operation(
+    operationId = "register",
+    summary = "Register.",
+  )
   fun register(
     @RequestBody
     @Valid
     user: LoginVM,
-  ) = ResponseEntity.ok(userAccountService.register(user.username!!, user.password!!))
+  ) = ResponseEntity.ok(
+    userAccountService.register(
+      user.username!!,
+      user.password!!
+    )
+  )
 
   /**
    * DELETE: delete user
    */
   @DeleteMapping("/user/{id}")
-  @Operation(summary = "Delete user.")
+  @Operation(
+    operationId = "deleteUser",
+    summary = "Delete user.",
+  )
   @PreAuthorize("hasRole('admin')")
   fun delete(
     @PathVariable
     id: Long,
   ) = userAccountService.deleteById(id)
-
 }
