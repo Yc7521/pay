@@ -7,6 +7,7 @@ import org.yc7521.pay.repository.UserInfoRepository
 @Service
 class UserInfoServiceImpl(
   private val userInfoRepository: UserInfoRepository,
+  private val roleRequestServiceImpl: RoleRequestServiceImpl,
 ) {
   /**
    * 获取用户信息
@@ -15,6 +16,11 @@ class UserInfoServiceImpl(
   fun getUserInfo(id: Long) = userInfoRepository
     .findById(id)
     .orElseThrow { NoSuchElementException("Error.User.not_found") }!!
+    .also { user ->
+      roleRequestServiceImpl.getRoleRequestByUserId(user.id!!)?.also {
+        user.nickname += " (${it.name})"
+      }
+    }
 
   /**
    * 修改用户昵称

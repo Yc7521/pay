@@ -10,6 +10,7 @@ import org.yc7521.pay.api.base.BaseApi
 import org.yc7521.pay.model.enums.RoleRequestState
 import org.yc7521.pay.model.vm.RoleReq
 import org.yc7521.pay.service.impl.RoleRequestServiceImpl
+import java.sql.SQLException
 import javax.validation.Valid
 
 @RestController
@@ -83,9 +84,17 @@ class RoleRequestApi(
     @RequestParam("size", defaultValue = "10")
     size: Int = 10,
   ) = ResponseEntity.ok(
-    roleRequestServiceImpl.getRoleRequestByApplicantId(
+    roleRequestServiceImpl.listRoleRequestByApplicantId(
       applicantId,
       PageRequest.of(page, size)
+    )
+  )
+
+  @GetMapping("/me")
+  @Operation(summary = "List RoleRequest by applicantId.")
+  fun me() = ResponseEntity.ok(
+    roleRequestServiceImpl.listRoleRequestByApplicantId(
+      currentUserInfo.id!!
     )
   )
 
@@ -109,7 +118,9 @@ class RoleRequestApi(
   fun reject(
     @PathVariable
     id: Long,
-  ) = ResponseEntity.ok(roleRequestServiceImpl.reject(id, currentUserInfo))
+    @RequestParam("force", defaultValue = "false")
+    force: Boolean = false,
+  ) = ResponseEntity.ok(roleRequestServiceImpl.reject(id, currentUserInfo, force))
 
   @PostMapping
   @Operation(
@@ -120,10 +131,14 @@ class RoleRequestApi(
     @Valid
     @RequestBody
     roleRequest: RoleReq,
-  ) = ResponseEntity.ok(
-    roleRequestServiceImpl.applyForRole(
-      currentUserInfo,
-      roleRequest
+  ) = try {
+    ResponseEntity.ok(
+      roleRequestServiceImpl.applyForRole(
+        currentUserInfo,
+        roleRequest
+      )
     )
-  )
+  } catch (e: SQLException) {
+    throw IllegalStateException("Error.RoleReq.duplicate_id_card")
+  }
 }

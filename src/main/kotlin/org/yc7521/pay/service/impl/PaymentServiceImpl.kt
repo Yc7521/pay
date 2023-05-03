@@ -9,7 +9,6 @@ import org.yc7521.pay.model.enums.PayState
 import org.yc7521.pay.model.vm.PayVM
 import org.yc7521.pay.repository.PayInfoRepository
 import org.yc7521.pay.repository.UserInfoRepository
-import org.yc7521.pay.util.PayException
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -48,11 +47,36 @@ class PaymentServiceImpl(
       }
     }
 
+    // use old one, if exists (require the same user)
+    CodeState.Created -> {
+      when (tradingCode.tradingType) {
+        TradingType.Receipt -> payInfoRepository
+          .findById(tradingCode.payId!!)
+          .orElseThrow { IllegalStateException("Error.PayInfo.unknown") }
+          .also {
+            if (it.payingUser!!.id != currUserId) {
+              throw IllegalStateException("Error.PayInfo.expired")
+            }
+          }
+
+        TradingType.Payment -> payInfoRepository
+          .findById(tradingCode.payId!!)
+          .orElseThrow { IllegalStateException("Error.PayInfo.unknown") }
+          .also {
+            if (it.receivingUser!!.id != currUserId) {
+              throw IllegalStateException("Error.PayInfo.expired")
+            }
+          }
+
+        null -> throw IllegalStateException("Error.PayInfo.unknown")
+      }
+    }
+
     else -> throw IllegalStateException("Error.PayInfo.duplicate_new")
   }.also {
     tradingCode.state = CodeState.Created
     tradingCode.payId = it.id
-  }
+  }!!
 
   /**
    * 创建交易记录(未交易)
@@ -157,5 +181,6 @@ class PaymentServiceImpl(
   /**
    * 删除一小时前所有未支付的交易记录
    */
-  fun deleteUnpaid() = payInfoRepository.deleteUnpaid(PayState.Unpaid, LocalDateTime.now().minusHours(1))
+  fun deleteUnpaid() =
+    payInfoRepository.deleteUnpaid(PayState.Unpaid, LocalDateTime.now().minusHours(1))
 }

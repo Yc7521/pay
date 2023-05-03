@@ -26,7 +26,7 @@ open class SecretKey(
   open var expired: LocalDateTime? = null,
 
   @ManyToOne(cascade = [CascadeType.ALL], optional = false)
-  @OnDelete(action = OnDeleteAction.CASCADE)
+  @OnDelete(action = OnDeleteAction.NO_ACTION)
   @JoinColumn(name = "user_info_id", nullable = false)
   open var userInfo: UserInfo? = null,
 )

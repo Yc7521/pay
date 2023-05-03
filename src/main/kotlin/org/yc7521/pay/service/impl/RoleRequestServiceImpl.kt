@@ -41,8 +41,22 @@ class RoleRequestServiceImpl(
    * 列出所有申请
    * @param id 用户id
    */
-  fun getRoleRequestByApplicantId(id: Long, page: PageRequest) =
+  fun listRoleRequestByApplicantId(id: Long, page: PageRequest) =
     roleRequestRepository.findAllByApplicantId(id, page)
+
+  /**
+   * 列出所有申请
+   * @param id 用户id
+   */
+  fun listRoleRequestByApplicantId(id: Long) =
+    roleRequestRepository.findAllByApplicantId(id)
+
+  /**
+   * 获取成功的申请
+   * @param id 用户id
+   */
+  fun getRoleRequestByUserId(id: Long) =
+    roleRequestRepository.findByApplicantIdAndState(id, Permit)
 
   /**
    * 申请商家身份
@@ -80,19 +94,18 @@ class RoleRequestServiceImpl(
       roleRequest.any { it.state == Unprocessed } ->
         throw IllegalStateException("Error.RoleReq.unprocessed")
 
-      roleRequest.isEmpty() ->
-        roleRequestRepository.save(
-          RoleRequest(
-            null,
-            LocalDateTime.now(),
-            null,
-            currentUser,
-            name,
-            idCard,
-            remarks,
-            role,
-          )
+      roleRequest.isEmpty() -> roleRequestRepository.save(
+        RoleRequest(
+          null,
+          LocalDateTime.now(),
+          null,
+          currentUser,
+          name,
+          idCard,
+          remarks,
+          role,
         )
+      )
 
       else -> roleRequest.first().let {
         when (it.state) {
@@ -137,13 +150,13 @@ class RoleRequestServiceImpl(
   /**
    * 审核商家身份 - 拒绝
    */
-  fun reject(id: Long, approver: UserInfo) =
+  fun reject(id: Long, approver: UserInfo, force: Boolean) =
     roleRequestRepository
       .findById(id)
       .orElseThrow { NoSuchElementException("Error.RoleReq.not_found") }!!
       .also { roleRequest ->
         roleRequest.finish = LocalDateTime.now()
-        roleRequest.state = Reject
+        roleRequest.state = if (force) Reject else CanReapply
         roleRequest.approver = approver
         roleRequestRepository.save(roleRequest)
       }

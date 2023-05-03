@@ -9,6 +9,7 @@ import org.yc7521.pay.model.enums.UserType
 import org.yc7521.pay.model.genPaymentCode
 import org.yc7521.pay.model.genReceiptCode
 import org.yc7521.pay.model.vm.RoleReq
+import org.yc7521.pay.model.vm.toVm
 import org.yc7521.pay.repository.PayInfoRepository
 import org.yc7521.pay.service.UserAccountService
 import org.yc7521.pay.service.data.TradingCodeCache
@@ -112,7 +113,12 @@ class UserApi(
   fun get(
     @PathVariable
     id: Long,
-  ) = ResponseEntity.ok(userInfoServiceImpl.getUserInfo(id))
+  ) = ResponseEntity.ok(
+    when (currentUserInfo.userType) {
+      UserType.Admin -> userInfoServiceImpl.getUserInfo(id)
+      else -> userInfoServiceImpl.getUserInfo(id).toVm()
+    }
+  )
 
   /**
    * GET: gen payment code
