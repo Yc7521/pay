@@ -91,7 +91,10 @@ class RoleRequestApi(
   )
 
   @GetMapping("/me")
-  @Operation(summary = "List RoleRequest by applicantId.")
+  @Operation(
+    operationId = "listMyRoleRequest",
+    summary = "List RoleRequest by applicantId.",
+  )
   fun me() = ResponseEntity.ok(
     roleRequestServiceImpl.listRoleRequestByApplicantId(
       currentUserInfo.id!!
